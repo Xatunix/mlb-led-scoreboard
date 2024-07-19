@@ -13,7 +13,8 @@ Game Display (background files):
 - Added play results for outs: Popout, Lineout, Flyout
 - Added distinction for hits that result in RBIs: Single_RBI, Double_RBI, Triple_RBI
 - Added Stolen Base
-- Changed many abbreviations to work with my new layout
+- Changed many play names/abbreviations to work with my new layout
+- Changed many pitch type names/abbreviations to work with my new layout
 - Created an /animations folder where .gif animations for many plays exist (triggered using matrix gif playing utility which must be installed)
 
 Game Display:
@@ -44,6 +45,7 @@ Pre/PostGame Display:
     - Select Team > ATL/BAL/TOR/etc.: Same as above, but every team (config.json_live_atl, config.json_live_bal, config.json_live_kc, etc. I did all of them.)
     - -Shutdown: Shutdown pi
   - Created many versions of the .config file to be copied around when using the iOS shortcut (See above)
+  - Colors: Used someone else's "official colors" files I found. Made some personal aesthetic-based changes (KC, AZ, MIA, AL, NL)
     
 
 
