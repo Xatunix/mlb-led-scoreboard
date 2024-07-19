@@ -28,7 +28,7 @@ class Pregame:
                 wins = game.pitcher_stat(away_id, "wins", "away")
                 losses = game.pitcher_stat(away_id, "losses", "away")
                 era = game.pitcher_stat(away_id, "era", "away")
-                self.away_starter = "{} ({}-{} {} ERA)".format(name, wins, losses, era)
+                self.away_starter = "{} ({}-{} {})".format(name, wins, losses, era)
             except:
                 debug.exception("Error getting away starter stats")
 
@@ -40,7 +40,7 @@ class Pregame:
                 wins = game.pitcher_stat(home_id, "wins", "home")
                 losses = game.pitcher_stat(home_id, "losses", "home")
                 era = game.pitcher_stat(home_id, "era", "home")
-                self.home_starter = "{} ({}-{} {} ERA)".format(name, wins, losses, era)
+                self.home_starter = "{} ({}-{} {})".format(name, wins, losses, era)
             except:
                 debug.exception("Error getting away starter stats")
                 
