@@ -1,1 +1,1 @@
-#These gifs were created for a 64x32 board. There is no gurantees they will work elsewhere
+#These gifs were created for a 64x32 board. There is no gurantees they will work elsewhere. They are called in renderers/game/game.py using paths such as "/home/USERNAME/animations/", and therefore would need to be moved to function
