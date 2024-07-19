@@ -19,7 +19,7 @@ API_FIELDS = (
 
 SCHEDULE_API_FIELDS = "dates,date,games,status,detailedState,abstractGameState,reason"
 
-GAME_UPDATE_RATE = 10
+GAME_UPDATE_RATE = 7
 
 
 class Game:
@@ -45,6 +45,7 @@ class Game:
         self._broadcasts = broadcasts
         self._series_status = series_status
         self._status = {}
+        print(self.game_id)
 
     def update(self, force=False) -> UpdateStatus:
         if force or self.__should_update():
@@ -314,6 +315,46 @@ class Game:
             in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
         ):
             result += "_looking"
+        if result == "field_out" and (
+            "flies"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_fly"
+        if result == "field_out" and (
+            "grounds"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_ground"
+        if result == "field_out" and (
+            "lines"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_line"
+        if result == "field_out" and (
+            "pop"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_pop"
+        if result == "single" and (
+            "scores"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_rbi"
+        if result == "double" and (
+            "scores"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_rbi"
+        if result == "triple" and (
+            "scores"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_rbi"
+        if result == "walk" and (
+            "scores"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_rbi"
         return result
 
     def __should_update(self):

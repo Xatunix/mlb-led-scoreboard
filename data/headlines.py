@@ -10,8 +10,8 @@ from data.update import UpdateStatus
 
 HEADLINE_UPDATE_RATE = 60 * 60  # 1 hour between feed updates
 HEADLINE_SPACER_SIZE = 10  # Number of spaces between headlines
-HEADLINE_MAX_FEEDS = 2  # Number of preferred team's feeds to fetch
-HEADLINE_MAX_ENTRIES = 7  # Number of headlines per feed
+HEADLINE_MAX_FEEDS = 5  # Number of preferred team's feeds to fetch
+HEADLINE_MAX_ENTRIES = 8  # Number of headlines per feed
 FALLBACK_DATE_FORMAT = "%A, %B %d"
 
 
@@ -88,6 +88,11 @@ TRADE_FEEDS = {
     "Rockies": "colorado-rockies",
 }
 
+TRADE_BASE_GEN = "https://feeds.feedburner.com"
+TRADE_PATH_GEN = "MlbTradeRumors"
+
+JOE_BASE = "https://joeblogs.joeposnanski.com"
+JOE_PATH = "feed"
 
 class Headlines:
     def __init__(self, config, year):
@@ -96,6 +101,7 @@ class Headlines:
         self.include_preferred = config.news_ticker_preferred_teams
         self.include_traderumors = config.news_ticker_traderumors
         self.include_countdowns = config.news_ticker_countdowns
+        self.include_joeblogs = config.news_ticker_joeblogs
         self.include_date = config.news_ticker_date
         self.date_format = config.news_ticker_date_format
         self.feed_urls = []
@@ -183,9 +189,14 @@ class Headlines:
                     self.feed_urls.append(self.__mlb_url_for_team(team))
 
         if self.include_traderumors:
+            self.feed_urls.append(self.__traderumors_url())
+
             if len(self.preferred_teams) > 0:
                 for team in self.preferred_teams:
                     self.feed_urls.append(self.__traderumors_url_for_team(team))
+
+        if self.include_joeblogs:
+            self.feed_urls.append(self.__joeblogs_url())
 
     def __mlb_url_for_team(self, team_name):
         feed_name = MLB_FEEDS.get(team_name, None)
@@ -195,6 +206,16 @@ class Headlines:
             feed_name = MLB_FEEDS["MLB"]
 
         return "{}/{}/{}".format(MLB_BASE, feed_name, MLB_PATH)
+
+    def __joeblogs_url(self):
+        feed_name = JOE_BASE
+        feed_path = JOE_PATH
+        return "{}/{}".format(feed_name, feed_path)
+
+    def __traderumors_url(self):
+        feed_name = TRADE_BASE_GEN
+        feed_path = TRADE_PATH_GEN
+        return "{}/{}".format(feed_name, feed_path)
 
     def __traderumors_url_for_team(self, team_name):
         feed_name = TRADE_FEEDS.get(team_name, None)
