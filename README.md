@@ -1,3 +1,39 @@
+# mlb-led-scoreboard-Xatunix changes
+News: 
+- Added to Joe Posnanski's Blog https://joeblogs.joeposnanski.com/ (and related configuration in .config file)
+- Added ALL team MLBTR news to display before specific team news (does not play with current values in .config file)
+- Modified some weather icons for baseballishness
+- Added a light boarder effect that shines the edges of the board (cycles on approximately every 5 minutes, then stays off for 10)
+
+Standings:
+- Modified colors for readability
+- (In progress) Using last line of 32x64 board (currently filled with background color) to indicate current standings being shown (Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
+
+Game Display (background files):
+- Added play results for outs: Popout, Lineout, Flyout
+- Added distinction for hits that result in RBIs: Single_RBI, Double_RBI, Triple_RBI
+- Added Stolen Base
+- Changed many abbreviations to work with my new layout
+- Created an /animations folder where .gif animations for many plays exist (triggered using matrix gif playing utility which must be installed)
+
+Game Display:
+- Moved the batter/pitcher info to the left so "AB:" "P:" are not taking up space
+- Changed outs to circles
+- Re-wrote the inning indicator arrow to be pointing left (so it could be moved to end of team stats bar
+- Rearranged data display code so Batter/Pitcher are always showing (this way you know WHO got a hit, or got struckout)
+- When a play result can be displayed, the count, pitch info, and pitch count disappear to make room for that info
+- Added .gif animations for many plays, triggered irregularly based on a random number
+- Added "ring of lights" flashing animation (in time with flashing of play display) for run scoring plays (using RBI definitions above)
+- Added "ring of lights" "crawling" animation for positive plays for the offense (hits, walks, stolen bases)
+- Added static "ring of lights" in red for Strikeouts
+- Bug fix: The inning number wasn't playing nicely with my format after 9 innings, so I manually moved it a couple spaces to the left > 9 innings
+
+Pre/PostGame Display:
+- Removed "ERA" and other extra spaces so not as much scrolling was needed to get through all info.
+- Removed some other info labels I deemed unnecessary in the scroll too
+- Bug Fix: After the 9th inning, the ordinal version of the number "10th" ran into the divider line, so I removed the ordinal and just display the inning number >9
+
+
 # mlb-led-scoreboard
 
 ![Current Version](https://img.shields.io/github/v/release/MLB-LED-Scoreboard/MLB-LED-Scoreboard) ![](https://img.shields.io/badge/python-3.8_%7C_3.9_%7C_3.10_%7C_3.11-blue)
