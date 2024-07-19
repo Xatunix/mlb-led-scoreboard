@@ -13,6 +13,14 @@ from renderers import scrollingtext
 from utils import center_text_position
 
 
+x = 0
+y = 0
+z = 0
+xo = 0
+yo = 0
+zo = 0
+w = 0
+o = 0
 def render_offday_screen(
     canvas, layout: Layout, colors: Color, weather: Weather, headlines: Headlines, time_format, text_pos
 ):
@@ -20,7 +28,6 @@ def render_offday_screen(
     text_len = __render_news_ticker(canvas, layout, colors, headlines, text_pos)
     __render_clock(canvas, layout, colors, time_format)
     __render_weather(canvas, layout, colors, weather)
-
     return text_len
 
 
@@ -32,8 +39,83 @@ def __render_clock(canvas, layout, colors, time_format):
     coords = layout.coords("offday.time")
     font = layout.font("offday.time")
     color = colors.graphics_color("offday.time")
+    color2 = colors.graphics_color("default.background")
     text_x = center_text_position(time_text, coords["x"], font["size"]["width"])
     graphics.DrawText(canvas, font["font"], text_x, coords["y"], color, time_text)
+    
+    global x
+    global y
+    global z
+    global xo
+    global yo
+    global zo
+    global w
+    global o
+    if x < 32:
+        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
+        x += 1
+    elif y < 32:
+        y += 1
+        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
+        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
+        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+    elif z <= 32:
+        z += 1 
+        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
+        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
+        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+
+        graphics.DrawLine(canvas, 0, 0, z, 0, color)
+        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+    elif w <= 2150:
+        w += 1
+        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
+        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
+        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+
+        graphics.DrawLine(canvas, 0, 0, z, 0, color)
+        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+    elif xo < 32:
+        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
+        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
+        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+
+        graphics.DrawLine(canvas, 0, 0, z, 0, color)
+        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+
+        graphics.DrawLine(canvas, 32-xo, 31, xo+32, 31, color2)
+        xo += 1
+    elif yo < 32:
+        yo += 1
+        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
+        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+        graphics.DrawLine(canvas, 0, 0, z, 0, color)
+        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+
+        graphics.DrawLine(canvas, 0, 31-yo, 0, 31, color2)
+        graphics.DrawLine(canvas, 63, 31-yo, 63, 31, color2)
+    elif zo <= 32:
+        zo += 1
+        graphics.DrawLine(canvas, 0, 0, z, 0, color)
+        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+
+        graphics.DrawLine(canvas, 0, 0, zo, 0, color2)
+        graphics.DrawLine(canvas, 63, 0, 63-zo, 0, color2)
+    elif o <= 21500:
+        o += 1
+    else:
+        x = 0
+        y = 0
+        z = 0
+        w = 0
+        o = 0
+        xo = 0
+        yo = 0
+        zo = 0
+
+   # graphics.DrawLine(canvas, 0, 14, 63, 14, color)
+   # graphics.DrawLine(canvas, 0, 14, 0, 31, color)
+   # graphics.DrawLine(canvas, 63, 14, 63, 31, color)
 
 
 def __render_weather(canvas, layout, colors, weather):
