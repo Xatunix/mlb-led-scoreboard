@@ -22,7 +22,7 @@ def _render_decision_scroll(canvas, layout, colors, postgame, text_pos, is_playo
     font = layout.font("final.scrolling_text")
     color = colors.graphics_color("final.scrolling_text")
     bgcolor = colors.graphics_color("default.background")
-    scroll_text = "W: {} {}-{} L: {} {}-{}".format(
+    scroll_text = "W:{} {}-{} L:{} {}-{}".format(
         postgame.winning_pitcher,
         postgame.winning_pitcher_wins,
         postgame.winning_pitcher_losses,
@@ -31,7 +31,7 @@ def _render_decision_scroll(canvas, layout, colors, postgame, text_pos, is_playo
         postgame.losing_pitcher_losses,
     )
     if postgame.save_pitcher:
-        scroll_text += " SV: {} ({})".format(postgame.save_pitcher, postgame.save_pitcher_saves)
+        scroll_text += " SV:{} ({})".format(postgame.save_pitcher, postgame.save_pitcher_saves)
 
     if is_playoffs:
         scroll_text += "   " + postgame.series_status

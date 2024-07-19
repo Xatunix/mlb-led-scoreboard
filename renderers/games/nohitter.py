@@ -2,9 +2,9 @@ from driver import graphics
 import data.config.layout as cfglayout
 import debug
 
-NOHITTER_TEXT = "N.H"
-PERFECT_GAME_TEXT = "P.G"
-UNKNOWN_TEXT = "???"
+NOHITTER_TEXT = "N H"
+PERFECT_GAME_TEXT = "P G"
+UNKNOWN_TEXT = "N?H?"
 
 
 def render_nohit_text(canvas, layout, colors):

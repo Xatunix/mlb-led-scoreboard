@@ -44,9 +44,9 @@ def _render_pregame_info(canvas, layout, colors, pregame: Pregame, probable_star
     bgcolor = colors.graphics_color("default.background")
     pitchers_text = pregame.away_starter + " vs " + pregame.home_starter
     if pregame.national_broadcasts:
-        pitchers_text += " TV: " + ", ".join(pregame.national_broadcasts)
+        pitchers_text += " TV:" + ", ".join(pregame.national_broadcasts)
     if pregame_weather and pregame.pregame_weather:
-        pitchers_text += " Weather: " + pregame.pregame_weather
+        pitchers_text += " Weather:" + pregame.pregame_weather
 
     if is_playoffs:
         pitchers_text += "   " + pregame.series_status

@@ -1,8 +1,5 @@
 from driver import graphics
 
-ABSOLUTE = "absolute"
-RELATIVE = "relative"
-
 def render_team_banner(
     canvas, layout, team_colors, home_team, away_team, full_team_names, short_team_names_for_runs_hits, show_score,
 ):
@@ -58,11 +55,11 @@ def render_team_banner(
         canvas, full_team_names, short_team_names_for_runs_hits, [home_team, away_team]
     )
 
-    away_name_end_pos = __render_team_text(canvas, layout, away_colors, away_team, "away", use_full_team_names, default_colors)
-    home_name_end_pos = __render_team_text(canvas, layout, home_colors, home_team, "home", use_full_team_names, default_colors)
+    __render_team_text(canvas, layout, away_colors, away_team, "away", use_full_team_names, default_colors)
+    __render_team_text(canvas, layout, home_colors, home_team, "home", use_full_team_names, default_colors)
 
-    __render_record_text(canvas, layout, away_colors, away_team, "away", default_colors, away_name_end_pos)
-    __render_record_text(canvas, layout, home_colors, home_team, "home", default_colors, home_name_end_pos)
+    __render_record_text(canvas, layout, away_colors, away_team, "away", default_colors)
+    __render_record_text(canvas, layout, home_colors, home_team, "home", default_colors)
 
     if show_score:
         # Number of characters in each score.
@@ -111,14 +108,12 @@ def __render_team_text(canvas, layout, colors, team, homeaway, full_team_names, 
     text_color_graphic = graphics.Color(text_color["r"], text_color["g"], text_color["b"])
     coords = layout.coords("teams.name.{}".format(homeaway))
     font = layout.font("teams.name.{}".format(homeaway))
-    team_text = "{:3s}".format(team.abbrev.upper()).strip()
+    team_text = "{:3s}".format(team.abbrev.upper())
     if full_team_names:
-        team_text = "{:13s}".format(team.name).strip()
+        team_text = "{:13s}".format(team.name)
     graphics.DrawText(canvas, font["font"], coords["x"], coords["y"], text_color_graphic, team_text)
 
-    return (coords["x"] + (len(team_text) * font["size"]["width"]), coords["y"])
-
-def __render_record_text(canvas, layout, colors, team, homeaway, default_colors, origin):
+def __render_record_text(canvas, layout, colors, team, homeaway, default_colors):
     if "losses" not in team.record or "wins" not in team.record:
         return
     if not layout.coords("teams.record").get("enabled", False):
@@ -129,14 +124,8 @@ def __render_record_text(canvas, layout, colors, team, homeaway, default_colors,
     coords = layout.coords("teams.record.{}".format(homeaway))
     font = layout.font("teams.record.{}".format(homeaway))
     record_text = "({}-{})".format(team.record["wins"], team.record["losses"])
+    graphics.DrawText(canvas, font["font"], coords["x"], coords["y"], text_color_graphic, record_text)
 
-    if layout.coords("teams.record").get("position", ABSOLUTE) != RELATIVE:
-        origin = (0, 0)
-
-    x = coords["x"] + origin[0]
-    y = coords["y"] + origin[1]
-
-    graphics.DrawText(canvas, font["font"], x, y, text_color_graphic, record_text)
 
 def __render_score_component(canvas, layout, colors, homeaway, default_colors, coords, component_val, width_chars):
     # The coords passed in are the rightmost pixel.
@@ -145,6 +134,10 @@ def __render_score_component(canvas, layout, colors, homeaway, default_colors, c
     # Number of pixels between runs/hits and hits/errors.
     rhe_coords = layout.coords("teams.runs.runs_hits_errors")
     text_color = colors.get("text", default_colors["text"])
+
+    text_color_a = colors.get("accent", default_colors["text"])
+    text_color_graphic_a = graphics.Color(text_color_a["r"], text_color_a["g"], text_color_a["b"])
+
     text_color_graphic = graphics.Color(text_color["r"], text_color["g"], text_color["b"])
     component_val = str(component_val)
     # Draw each digit from right to left.
