@@ -1,28 +1,29 @@
 {
 	"preferred": {
 		"teams": ["Royals"],
-		"divisions": ["AL Central", "AL Wild Card"]
+		"divisions": ["AL Wild Card", "AL Central", "AL East", "AL West", "NL Wild Card", "NL Central", "NL East", "NL West"]
 	},
 	"news_ticker": {
 		"team_offday": true,
 		"always_display": false,
-		"preferred_teams": true,
+		"preferred_teams": false,
 		"display_no_games_live": false,
+                "joeblogs": true,
 		"traderumors": true,
 		"mlb_news": true,
 		"countdowns": true,
-		"date": true,
+		"date": false,
 		"date_format": "%A, %B %-d"
 	},
 	"standings": {
 		"team_offday": false,
 		"mlb_offday": true,
-		"always_display": false,
+		"always_display": true,
 		"display_no_games_live": true
 	},
 	"rotation": {
 		"enabled": true,
-		"scroll_until_finished": true,
+		"scroll_until_finished": false,
 		"only_preferred": false,
 		"only_live": true,
 		"rates": {
@@ -31,22 +32,22 @@
 			"pregame": 15.0
 		},
 		"while_preferred_team_live": {
-			"enabled": false,
-			"during_inning_breaks": false
+			"enabled": true,
+			"during_inning_breaks": true
 		}
 	},
 	"weather": {
-		"apikey": "YOUR_API_KEY_HERE",
-		"location": "Chicago,il,us",
+		"apikey": "e0909d9edf0375ef02f273fad60e7da7",
+		"location": "Kansas City,mo,us",
 		"metric_units": false
 	},
 	"time_format": "12h",
-	"end_of_day": "00:00",
+	"end_of_day": "02:00",
 	"full_team_names": true,
-	"short_team_names_for_runs_hits": true,
-	"preferred_game_update_delay_in_10s_of_seconds": 2,
+	"short_team_names_for_runs_hits": false,
+	"preferred_game_update_delay_in_10s_of_seconds": 1,
 	"pregame_weather": true,
-	"scrolling_speed": 2,
+	"scrolling_speed": 4,
 	"debug": false,
 	"demo_date": false
 }
