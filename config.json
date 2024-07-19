@@ -49,5 +49,5 @@
 	"pregame_weather": true,
 	"scrolling_speed": 5,
 	"debug": false,
-	"demo_date": "2024-07-16"
+	"demo_date": false
 }
