@@ -8,6 +8,7 @@ from utils import center_text_position
 
 def render_standings(canvas, layout: Layout, colors: Color, division: Division, stat):
     league = division.name[:2]  # al or nl
+
     __fill_bg(canvas, colors, league)
     if canvas.width > 32:
         __render_static_wide_standings(canvas, layout, colors, division, league)
@@ -43,6 +44,8 @@ def __render_rotating_standings(canvas, layout, colors, division, stat, league):
         graphics.DrawText(canvas, font["font"], coords["team"]["record"]["x"], offset, color, stat_text)
 
         offset += coords["offset"]
+
+    __render_standings_indicator(canvas, layout, colors, division, league)
 
 
 def __render_static_wide_standings(canvas, layout, colors, division, league):
@@ -85,6 +88,53 @@ def __render_static_wide_standings(canvas, layout, colors, division, league):
         graphics.DrawText(canvas, font["font"], gb_text_x, offset, color, gb_text)
 
         offset += coords["offset"]
+
+    __render_standings_indicator(canvas, layout, colors, division, league)
+
+def __render_standings_indicator(canvas, layout, colors, division, league):
+    coords = layout.coords("standings")
+    font = layout.font("standings")
+    divider_color = get_standings_color_node(colors, "divider", league)
+    team_stat_color = get_standings_color_node(colors, "team.stat", league)
+    team_name_color = get_standings_color_node(colors, "team.name", league)
+    start = coords.get("start", 0)
+    offset = coords["offset"]
+
+    xMax = canvas.width
+    yMax = canvas.height
+    xMin = 0
+    yMin = 0
+    xS = xMax-1
+    xH = xMax/2
+    xt1 = xH / 3
+    xt2 = (xH / 3) * 2
+    yS = yMax-1
+
+    graphics.DrawLine(canvas, xMin, yS, xS, yS, divider_color)
+
+    if ("Wild Card" in division.name):
+        for x in range (xMin, xMax):
+            if (x % 5) > 0:
+                graphics.DrawLine(canvas, x, yS, x, yS, divider_color)
+                #graphics.DrawLine(canvas, x, yMin, x, yMin, divider_color)
+            else:
+                graphics.DrawLine(canvas, x, yS, x, yS, team_name_color)
+                #graphics.DrawLine(canvas, x, yMin, x, yMin, team_name_color)
+    if ("West" in division.name):
+        if ("AL" in division.name):
+            graphics.DrawLine(canvas, xMin, yS, xt1, yS, team_name_color)
+        else:
+            graphics.DrawLine(canvas, xMin+xH, yS, xt1+xH, yS, team_name_color)
+    elif ("Central" in division.name):
+        if ("AL" in division.name):
+            graphics.DrawLine(canvas, xt1, yS, xt2, yS, team_name_color)
+        else:
+            graphics.DrawLine(canvas, xt1+xH, yS, xt2+xH, yS, team_name_color)
+    elif ("East" in division.name):
+        if ("AL" in division.name):
+            graphics.DrawLine(canvas, xt2, yS, xH, yS, team_name_color)
+        else:
+            graphics.DrawLine(canvas, xt2+xH, yS, xS, yS, team_name_color)
 
 
 def __fill_bg(canvas, colors, league: str):

@@ -12,15 +12,29 @@ from data.weather import Weather
 from renderers import scrollingtext
 from utils import center_text_position
 
+from random import random
+#import subprocess
+#from pathlib import Path
+#import os
+
 
 x = 0
 y = 0
 z = 0
+xx = 0
+yy = 0
+zz = 0
+xxx = 0
+yyy = 0
+zzz = 0
 xo = 0
 yo = 0
 zo = 0
 w = 0
 o = 0
+i = 0
+agif = False
+
 def render_offday_screen(
     canvas, layout: Layout, colors: Color, weather: Weather, headlines: Headlines, time_format, text_pos
 ):
@@ -43,79 +57,499 @@ def __render_clock(canvas, layout, colors, time_format):
     text_x = center_text_position(time_text, coords["x"], font["size"]["width"])
     graphics.DrawText(canvas, font["font"], text_x, coords["y"], color, time_text)
     
-    global x
-    global y
-    global z
-    global xo
-    global yo
-    global zo
-    global w
-    global o
-    if x < 32:
-        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
-        x += 1
-    elif y < 32:
-        y += 1
-        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
-        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
-        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
-    elif z <= 32:
-        z += 1 
-        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
-        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
-        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+    #global agif
+    #home = os.environ['HOME']
+    #home = os.path.expanduser('~')
+    #home = "/home/bof"
+    #liv = str(home) + "/mlb-led-scoreboard/rpi-rgb-led-matrix/utils/led-image-viewer"
+    #gifp = "/animations/so.gif"
+    #gifpp = str(home) + gifp
+    #if agif==False:
+    #    agif = True
+    #    #gif = subprocess.Popen(["/home/bof/mlb-led-scoreboard/rpi-rgb-led-matrix/utils/led-image-viewer", "-l1", "-D600", "${HOME}/animations/so.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+    #    gif = subprocess.Popen([liv, "-l1", "-D600", gifpp, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
 
-        graphics.DrawLine(canvas, 0, 0, z, 0, color)
-        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
-    elif w <= 2150:
-        w += 1
-        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
-        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
-        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
+    #if rdm < .25:
+    #    animation_ring(canvas, colors)
+    #elif (rdm >= .25) and (rdm < .5):
+    #    animation_stripe(canvas, colors)
+    #elif (rdm >= .5) and (rdm < .75):
+    #    animation_flash(canvas, colors)
+    #else:
+    animation_crown(canvas, colors)
+    #animation_chase(canvas, colors)
 
-        graphics.DrawLine(canvas, 0, 0, z, 0, color)
-        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
-    elif xo < 32:
-        graphics.DrawLine(canvas, 32-x, 31, x+32, 31, color)
-        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
-        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
 
-        graphics.DrawLine(canvas, 0, 0, z, 0, color)
-        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
 
-        graphics.DrawLine(canvas, 32-xo, 31, xo+32, 31, color2)
-        xo += 1
-    elif yo < 32:
-        yo += 1
-        graphics.DrawLine(canvas, 0, 31-y, 0, 31, color)
-        graphics.DrawLine(canvas, 63, 31-y, 63, 31, color)
-        graphics.DrawLine(canvas, 0, 0, z, 0, color)
-        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+def animation_ring(canvas, colors):
+    color = colors.graphics_color("offday.time")
+    color0 = colors.graphics_color("default.background")
+    color1 = colors.graphics_color("standings.nl.divider")
+    color2 = colors.graphics_color("standings.al.divider")
 
-        graphics.DrawLine(canvas, 0, 31-yo, 0, 31, color2)
-        graphics.DrawLine(canvas, 63, 31-yo, 63, 31, color2)
-    elif zo <= 32:
-        zo += 1
-        graphics.DrawLine(canvas, 0, 0, z, 0, color)
-        graphics.DrawLine(canvas, 63, 0, 63-z, 0, color)
+    xMax = canvas.width
+    yMax = canvas.height
+    xMin = 0
+    yMin = 0
+    xS = xMax-1
+    xH = xMax/2
+    yS = yMax-1
+    graphics.DrawLine(canvas, xMin, yS, xS, yS, color)
+    graphics.DrawLine(canvas, xMin, yMin, xS, yMin, color)
+    graphics.DrawLine(canvas, xMin, yMin, xMin, yS, color)
+    graphics.DrawLine(canvas, xS, yMin, xS, yS, color)
 
-        graphics.DrawLine(canvas, 0, 0, zo, 0, color2)
-        graphics.DrawLine(canvas, 63, 0, 63-zo, 0, color2)
-    elif o <= 21500:
-        o += 1
-    else:
-        x = 0
-        y = 0
-        z = 0
-        w = 0
-        o = 0
-        xo = 0
-        yo = 0
-        zo = 0
 
-   # graphics.DrawLine(canvas, 0, 14, 63, 14, color)
-   # graphics.DrawLine(canvas, 0, 14, 0, 31, color)
-   # graphics.DrawLine(canvas, 63, 14, 63, 31, color)
+def animation_crown(canvas, colors):
+        global x
+        global y
+        global z
+        global xo
+        global yo
+        global zo
+        global w
+        global o
+
+        color = colors.graphics_color("offday.time")
+        color2 = colors.graphics_color("default.background")
+        xMax = canvas.width
+        yMax = canvas.height
+        xMin = 0 #must stay 0
+        yMin = 0 #14
+        xS = xMax-1
+        xH = xMax/2 
+        yS = yMax-1
+        if x < xH:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color)
+            x += 1
+        elif y <= yS-yMin-1:
+            y += 1
+            graphics.DrawLine(canvas, xMin, yS, x+xH, yS, color)
+            graphics.DrawLine(canvas, xMin, yS-y, xMin, yS, color)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color)
+        elif z <= yMax:
+            z += 1
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color)
+            graphics.DrawLine(canvas, xMin, yS-y, xMin, yS, color)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color)
+
+            graphics.DrawLine(canvas, xMin, yMin, z, yMin, color)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color)
+        elif w <= 2150:
+            w += 1
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color)
+            graphics.DrawLine(canvas, xMin, yS-y, xMin, yS, color)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color)
+
+            graphics.DrawLine(canvas, xMin, yMin, z, yMin, color)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color)
+        elif xo < xH:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color)
+            graphics.DrawLine(canvas, xMin, yS-y, xMin, yS, color)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color)
+
+            graphics.DrawLine(canvas, xMin, yMin, z, yMin, color)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color)
+
+            graphics.DrawLine(canvas, xH-xo, yS, xo+xH, yS, color2)
+            xo += 1
+        elif yo <= yS-yMin-1:
+            yo += 1
+            graphics.DrawLine(canvas, xMin, yS-y, xMin, yS, color)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color)
+
+            graphics.DrawLine(canvas, xMin, yMin, z, yMin, color)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color)
+
+            graphics.DrawLine(canvas, xMin, yS-yo, xMin, yS, color2)
+            graphics.DrawLine(canvas, xS, yS-yo, xS, yS, color2)
+        elif zo <= xH:
+            zo += 1
+            graphics.DrawLine(canvas, xMin, yMin, z, yMin, color)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color)
+
+            graphics.DrawLine(canvas, xMin, yMin, zo, yMin, color2)
+            graphics.DrawLine(canvas, xS, yMin, xS-zo, yMin, color2)
+        elif o <= 4300: #2150
+            o += 1
+        else:
+            x = 0
+            y = 0
+            z = 0
+            xo = 0
+            yo = 0
+            zo = 0
+            o = 0
+            w = 0
+
+def animation_crown3(canvas, colors):
+        global x
+        global y
+        global z
+        global xx
+        global yy
+        global zz
+        global xxx
+        global yyy
+        global zzz
+        global xo
+        global yo
+        global zo
+        global w
+        global o
+
+        #color = colors.graphics_color("offday.time")
+        color4 = colors.graphics_color("default.background")
+        color3 = colors.graphics_color("standings.nl.divider")
+        color2 = colors.graphics_color("atbat.play_result")
+        color1 = colors.graphics_color("standings.al.divider")
+        xMax = canvas.width
+        yMax = canvas.height
+        xMin = 0 #must stay 0
+        yMin = 0 #14
+        xS = xMax-1
+        xH = xMax/2 
+        yS = yMax-1
+        if x < xH:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color1)
+            x += 1
+        elif y <= yS-yMin-1:
+            y += 1
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color1)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color1)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color1)
+        elif z <= yMax:
+            z += 1
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color1)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color1)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color1)
+
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color1)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color1)
+        elif xx < xH:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color1)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color1)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color1)
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color1)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color1)
+
+            xx += 1
+            graphics.DrawLine(canvas, xH-xx, yS, xx+xH, yS, color2)
+        elif yy <= yS-yMin-1:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color1)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color1)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color1)
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color1)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color1)
+
+            graphics.DrawLine(canvas, xH-xx, yS, xx+xH, yS, color2)
+
+            yy += 1
+            graphics.DrawLine(canvas, 0, yS-yy, 0, yS, color2)
+            graphics.DrawLine(canvas, xS, yS-yy, xS, yS, color2)
+        elif zz <= yMax:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color1)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color1)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color1)
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color1)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color1)
+
+            graphics.DrawLine(canvas, xH-xx, yS, xx+xH, yS, color2)
+            graphics.DrawLine(canvas, 0, yS-yy, 0, yS, color2)
+            graphics.DrawLine(canvas, xS, yS-yy, xS, yS, color2)
+
+            zz += 1
+            graphics.DrawLine(canvas, 0, yMin, zz, yMin, color2)
+            graphics.DrawLine(canvas, xS, yMin, xS-zz, yMin, color2)
+        elif xxx < xH:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color2)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color2)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color2)
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color2)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color2)
+
+            xxx += 1
+            graphics.DrawLine(canvas, xH-xxx, yS, xxx+xH, yS, color3)
+        elif yyy <= yS-yMin-1:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color2)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color2)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color2)
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color2)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color2)
+
+            graphics.DrawLine(canvas, xH-xxx, yS, xxx+xH, yS, color3)
+
+            yyy += 1
+            graphics.DrawLine(canvas, 0, yS-yyy, 0, yS, color3)
+            graphics.DrawLine(canvas, xS, yS-yyy, xS, yS, color3)
+        elif zzz <= yMax:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color2)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color2)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color2)
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color2)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color2)
+
+            graphics.DrawLine(canvas, xH-xxx, yS, xxx+xH, yS, color3)
+            graphics.DrawLine(canvas, 0, yS-yyy, 0, yS, color3)
+            graphics.DrawLine(canvas, xS, yS-yyy, xS, yS, color3)
+
+            zzz += 1
+            graphics.DrawLine(canvas, 0, yMin, zzz, yMin, color3)
+            graphics.DrawLine(canvas, xS, yMin, xS-zzz, yMin, color3)
+        elif xo < xH:
+            graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color3)
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color3)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color3)
+
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color3)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color3)
+
+            graphics.DrawLine(canvas, xH-xo, yS, xo+xH, yS, color4)
+            xo += 1
+        elif yo <= yS-yMin-1:
+            yo += 1
+            graphics.DrawLine(canvas, 0, yS-y, 0, yS, color3)
+            graphics.DrawLine(canvas, xS, yS-y, xS, yS, color3)
+
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color3)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color3)
+
+            graphics.DrawLine(canvas, 0, yS-yo, 0, yS, color4)
+            graphics.DrawLine(canvas, xS, yS-yo, xS, yS, color4)
+        elif zo <= xH:
+            zo += 1
+            graphics.DrawLine(canvas, 0, yMin, z, yMin, color3)
+            graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color3)
+
+            graphics.DrawLine(canvas, 0, yMin, zo, yMin, color4)
+            graphics.DrawLine(canvas, xS, yMin, xS-zo, yMin, color4)
+        elif o <= 4300:
+            o += 1
+        else:
+            x = 0
+            y = 0
+            z = 0
+            xx = 0
+            yy = 0
+            zz = 0
+            xxx = 0
+            yyy = 0
+            zzz = 0
+            xo = 0
+            yo = 0
+            zo = 0
+            o = 0
+            w = 0
+
+def animation_stripe(canvas, colors):
+        global x
+        global y
+        global z
+        global xo
+        global yo
+        global zo
+        global w
+        global o
+
+        color = colors.graphics_color("offday.time")
+        color0 = colors.graphics_color("default.background")
+        color1 = colors.graphics_color("standings.nl.divider")
+        color2 = colors.graphics_color("standings.al.divider")
+        color3 = colors.graphics_color("atbat.play_result")
+
+        xMax = canvas.width
+        yMax = canvas.height
+        xMin = 0
+        yMin = 0
+        xS = xMax-1
+        xH = xMax/2 
+        yS = yMax-1
+
+        if (w < 4300):
+            for x in range (xMin, xMax):
+                if (x % 3) > 0:
+                    graphics.DrawLine(canvas, x, yS, x, yS, color0)
+                    graphics.DrawLine(canvas, x, yMin, x, yMin, color0)
+                else:
+                    graphics.DrawLine(canvas, x, yS, x, yS, color)
+                    graphics.DrawLine(canvas, x, yMin, x, yMin, color)
+
+            for y in range (yMin, yMax):
+                if (y % 3) > 0:
+                    graphics.DrawLine(canvas, xMin, y, xMin, y, color0)
+                    graphics.DrawLine(canvas, xS, y, xS, y, color0)
+                else:
+                    graphics.DrawLine(canvas, xMin, y, xMin, y, color)
+                    graphics.DrawLine(canvas, xS, y, xS, y, color)
+            w += 1
+            o = 0
+        else:
+            o += 1
+
+        if (w >= 4300) and (o >= 4300):
+            o = 0
+            w = 0 
+
+def animation_flash(canvas, colors):
+        global x
+        global y
+        global z
+        global xo
+        global yo
+        global zo
+        global w
+        global o
+
+        color1 = colors.graphics_color("offday.time")
+        color2 = colors.graphics_color("default.background")
+        #color1 = colors.graphics_color("standings.nl.divider")
+        #color2 = colors.graphics_color("standings.al.divider")
+
+        xMax = canvas.width
+        yMax = canvas.height
+        xMin = 0
+        yMin = 0
+        xS = xMax-1
+        xH = xMax/2
+        yS = yMax-1
+       
+        if (w < 1000):
+            for x in range (xMin, xMax):
+                if (x % 4) > 0:
+                    graphics.DrawLine(canvas, x, yS, x, yS, color1)
+                    graphics.DrawLine(canvas, x, yMin, x, yMin, color1)
+                else:
+                    graphics.DrawLine(canvas, x, yS, x, yS, color2)
+                    graphics.DrawLine(canvas, x, yMin, x, yMin, color2)
+
+            for y in range (yMin, yMax):
+                if (y % 4) > 0:
+                    graphics.DrawLine(canvas, xMin, y, xMin, y, color1)
+                    graphics.DrawLine(canvas, xS, y, xS, y, color1)
+                else:
+                    graphics.DrawLine(canvas, xMin, y, xMin, y, color2)
+                    graphics.DrawLine(canvas, xS, y, xS, y, color2)
+            w += 1
+            o = 0
+        else:
+            for x in range (xMin, xMax):
+                if (x % 3) > 0:
+                    graphics.DrawLine(canvas, x, yS, x, yS, color2)
+                    graphics.DrawLine(canvas, x, yMin, x, yMin, color2)
+                else:
+                    graphics.DrawLine(canvas, x, yS, x, yS, color1)
+                    graphics.DrawLine(canvas, x, yMin, x, yMin, color1)
+
+            for y in range (yMin, yMax):
+                if (y % 3) > 0:
+                    graphics.DrawLine(canvas, xMin, y, xMin, y, color2)
+                    graphics.DrawLine(canvas, xS, y, xS, y, color2)
+                else:
+                    graphics.DrawLine(canvas, xMin, y, xMin, y, color1)
+                    graphics.DrawLine(canvas, xS, y, xS, y, color1)
+
+            o += 1
+            #color = color2 
+            #color2 = color1
+            #color1 = color
+        if (w >= 1000) and (o >= 1000):
+            o = 0
+            w = 0
+
+
+def animation_chase(canvas, colors):
+        global x
+        global y
+        global z
+        global xo
+        global yo
+        global zo
+        global w
+        global o
+        global i
+
+        color = colors.graphics_color("offday.time")
+        color0 = colors.graphics_color("default.background")
+        color1 = colors.graphics_color("standings.nl.divider")
+        color2 = colors.graphics_color("standings.al.divider")
+        color3 = colors.graphics_color("atbat.play_result")
+
+        xMax = canvas.width
+        yMax = canvas.height
+        xMin = 0
+        yMin = 0
+        xS = xMax-1
+        xH = xMax/2 
+        yS = yMax-1
+
+        i = 3
+
+        if (xMin == 0):
+
+            if (w > 30):
+                w = 0
+                for x in range (xMin, xMax):
+                    if (x % i) > 0:
+                        graphics.DrawLine(canvas, x+3, yS, x+3, yS, color0)
+                        graphics.DrawLine(canvas, x-3, yMin, x-3, yMin, color0)
+                    else:
+                        graphics.DrawLine(canvas, x+3, yS, x+3, yS, color)
+                        graphics.DrawLine(canvas, x-3, yMin, x-3, yMin, color)
+                for y in range (yMin, yMax):
+                    if (y % i) > 0:
+                        graphics.DrawLine(canvas, xMin, y+3, xMin, y+3, color0)
+                        graphics.DrawLine(canvas, xS, y-3, xS, y-3, color0)
+                    else:
+                        graphics.DrawLine(canvas, xMin, y+3, xMin, y+3, color)
+                        graphics.DrawLine(canvas, xS, y-3, xS, y-3, color)
+            elif (w > 20):
+                w += 1
+                for x in range (xMin, xMax):
+                    if (x % i) > 0:
+                        graphics.DrawLine(canvas, x+2, yS, x+2, yS, color0)
+                        graphics.DrawLine(canvas, x-2, yMin, x-2, yMin, color0)
+                    else:
+                        graphics.DrawLine(canvas, x+2, yS, x+2, yS, color)
+                        graphics.DrawLine(canvas, x-2, yMin, x-2, yMin, color)
+                for y in range (yMin, yMax):
+                    if (y % i) > 0:
+                        graphics.DrawLine(canvas, xMin, y+2, xMin, y+2, color0)
+                        graphics.DrawLine(canvas, xS, y-2, xS, y-2, color0)
+                    else:
+                        graphics.DrawLine(canvas, xMin, y+2, xMin, y+2, color)
+                        graphics.DrawLine(canvas, xS, y-2, xS, y-2, color)
+            elif (w > 10):
+                w += 1
+                for x in range (xMin, xMax):
+                    if (x % i) > 0:
+                        graphics.DrawLine(canvas, x+1, yS, x+1, yS, color0)
+                        graphics.DrawLine(canvas, x-1, yMin, x-1, yMin, color0)
+                    else:
+                        graphics.DrawLine(canvas, x+1, yS, x+1, yS, color)
+                        graphics.DrawLine(canvas, x-1, yMin, x-1, yMin, color)
+                for y in range (yMin, yMax):
+                    if (y % i) > 0:
+                        graphics.DrawLine(canvas, xMin, y+1, xMin, y+1, color0)
+                        graphics.DrawLine(canvas, xS, y-1, xS, y-1, color0)
+                    else:
+                        graphics.DrawLine(canvas, xMin, y+1, xMin, y+1, color)
+                        graphics.DrawLine(canvas, xS, y-1, xS, y-1, color)
+            else:
+                w += 1
+                for x in range (xMin, xMax):
+                    if (x % i) > 0:
+                        graphics.DrawLine(canvas, x, yS, x, yS, color0)
+                        graphics.DrawLine(canvas, x, yMin, x, yMin, color0)
+                    else:
+                        graphics.DrawLine(canvas, x, yS, x, yS, color)
+                        graphics.DrawLine(canvas, x, yMin, x, yMin, color)
+                for y in range (yMin, yMax):
+                    if (y % i) > 0:
+                        graphics.DrawLine(canvas, xMin, y, xMin, y, color0)
+                        graphics.DrawLine(canvas, xS, y, xS, y, color0)
+                    else:
+                        graphics.DrawLine(canvas, xMin, y, xMin, y, color)
+                        graphics.DrawLine(canvas, xS, y, xS, y, color)
 
 
 def __render_weather(canvas, layout, colors, weather):
