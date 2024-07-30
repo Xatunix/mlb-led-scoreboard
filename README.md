@@ -7,7 +7,7 @@ News:
 
 Standings:
 - Modified colors for readability
-- (In progress) Using last line of 64x32 board (currently filled with background color) to indicate current standings being shown (Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
+   Usied bottom line of board (currently filled with background color) to indicate current standings being shown (Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
 
 Game Display (background files):
 - Added play results for outs: Popout, Lineout, Flyout
@@ -25,10 +25,13 @@ Game Display:
 - When a play result can be displayed, the count, pitch info, and pitch count disappear to make room for that info
 - Added .gif animations for many plays, triggered irregularly based on a random number (currently only compatible with 64x32)
   - (In Progress) Currently these overlap the play result readout. I'm trying to blank this out until the gif is done.
+- Added 7th inning stretch animations
 - Added "ring of lights" flashing animation (in time with flashing of play display) for run scoring plays (using RBI definitions above)
-- Added "ring of lights" "crawling" animation for positive plays for the offense (hits, walks, stolen bases)
+- Added "ring of lights" "crawling" animation for positive plays for the offense (hits)
+- Added "ring of lights" "chasing" animations for walks, steals, and hit by pitches
 - Added static "ring of lights" in red for Strikeouts
 - Bug fix: The inning number wasn't playing nicely with my format after 9 innings, so I manually moved it a couple spaces to the left > 9 innings
+- Added scrolling for long names in-between innings
 
 Pre/PostGame Display:
 - Removed "ERA" and other extra spaces so not as much scrolling was needed to get through all info.
