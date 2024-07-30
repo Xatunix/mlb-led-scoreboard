@@ -189,6 +189,7 @@ class Headlines:
                     self.feed_urls.append(self.__mlb_url_for_team(team))
 
         if self.include_traderumors:
+            #Code to all all team news to feed
             self.feed_urls.append(self.__traderumors_url())
 
             if len(self.preferred_teams) > 0:

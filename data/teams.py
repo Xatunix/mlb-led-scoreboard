@@ -36,6 +36,14 @@ TEAM_FULL = {
     "Dodgers": "Los Angeles Dodgers",
     "Nationals": "Washington Nationals",
     "Mets": "New York Mets",
+    "American": "American League All-Stars",
+    "National": "National League All-Stars",
+    "American": "AL All-Stars",
+    "National": "NL All-Stars",
+    "American League All-Stars": "American",
+    "National League All-Stars": "National",
+    "AL All-Stars": "American",
+    "NL All-Stars": "National",
 }
 
 TEAM_ABBR_LN = {
@@ -69,4 +77,8 @@ TEAM_ABBR_LN = {
     "Los Angeles Dodgers": "LAD",
     "Washington Nationals": "WSH",
     "New York Mets": "NYM",
+    "American League All-Stars": "AL",
+    "National League All-Stars": "NL",
+    "AL All-Stars": "AL",
+    "NL All-Stars": "NL",
 }
