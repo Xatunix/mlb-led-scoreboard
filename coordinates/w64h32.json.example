@@ -150,9 +150,10 @@
       "x": 15,
       "y": 29,
       "font_name": "5x7",
-      "desc_length": "short",
+      "desc_length": "long",
       "enabled": true
     }
+
   },
   "batter_count": {
     "x": 34,
@@ -274,7 +275,6 @@
     },
     "record": {
       "enabled": false,
-      "position": "absolute",
       "away": {
         "x": 15,
         "y": 6
