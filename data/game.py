@@ -400,20 +400,70 @@ class Game:
             result += "_rbi"
 
         if result == "home_run" and (
-            "2"
+            str(2)
             in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("rbi", "")
         ):
             result += "_2"
         elif result == "home_run" and (
-            "3"
+            str(3)
             in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("rbi", "")
         ):
             result += "_3"
         elif result == "home_run" and (
-            "4"
+            str(4)
             in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("rbi", "")
         ):
             result += "_4"
+        return result
+
+    def field_out_type(self):
+        result = self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("eventType", "")
+        if result == "field_out" and (
+            "flies"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_fly"
+        elif result == "field_out" and (
+            "grounds"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_ground"
+        elif result == "field_out" and (
+            "lines"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_line"
+        elif result == "field_out" and (
+            "pop"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_pop"
+        return result
+
+    def scoring_play(self):
+        result = self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("eventType", "")
+        if "scores" in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", ""):
+            result += "_rbi"
+        return result
+
+    def current_play_result2(self):
+        result = self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("eventType", "")
+        if result == "strikeout" and (
+            "called"
+            in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", "")
+        ):
+            result += "_looking"
+        elif result == "field_out":
+            field_out_type(self)
+        elif result == "home_run":
+            if 2 in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("rbi", ""):
+                result += "_2"
+            elif 3 in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("rbi", ""):
+                result += "_3"
+            elif 3 in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("rbi", ""):
+                result += "_4"
+        elif "scores" in self._current_data["liveData"]["plays"].get("currentPlay", {}).get("result", {}).get("description", ""):
+            scoring_play(self)
         return result
 
     def __should_update(self):

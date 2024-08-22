@@ -8,10 +8,10 @@ import debug
 from data.dates import Dates
 from data.update import UpdateStatus
 
-HEADLINE_UPDATE_RATE = 60 * 60  # 1 hour between feed updates
-HEADLINE_SPACER_SIZE = 10  # Number of spaces between headlines
-HEADLINE_MAX_FEEDS = 5  # Number of preferred team's feeds to fetch
-HEADLINE_MAX_ENTRIES = 8  # Number of headlines per feed
+HEADLINE_UPDATE_RATE = 30 * 60  # 30 mins between feed updates
+HEADLINE_SPACER_SIZE = 7  # 7 Number of spaces between headlines
+HEADLINE_MAX_FEEDS = 8  # 5 Number of preferred team's feeds to fetch
+HEADLINE_MAX_ENTRIES = 7  # 8 Number of headlines per feed
 FALLBACK_DATE_FORMAT = "%A, %B %d"
 
 
@@ -93,6 +93,11 @@ TRADE_PATH_GEN = "MlbTradeRumors"
 
 JOE_BASE = "https://joeblogs.joeposnanski.com"
 JOE_PATH = "feed"
+
+ATHLETIC_BASE = "https://www.nytimes.com/athletic"
+ATHLETIC_MLB_PATH = "/mlb/?rss=.xml"
+ATHLETIC_GOLF_PATH = "/golf/?rss=.xml"
+ATHLETIC_ROYALS_PATH ="/mlb/team/royals/?rss=.xml"
 
 class Headlines:
     def __init__(self, config, year):
@@ -177,27 +182,32 @@ class Headlines:
             if idx < max_entries:
                 text = html.unescape(entry.title)
                 headlines += text + spaces
-        return title + spaces + headlines
+        #Add extra denotation of titles
+        return "--" + title + "--" + spaces + headlines
 
     def __compile_feed_list(self):
-        if self.include_mlb:
-            self.feed_urls.append(self.__mlb_url_for_team("MLB"))
-
         if self.include_preferred:
             if len(self.preferred_teams) > 0:
                 for team in self.preferred_teams:
                     self.feed_urls.append(self.__mlb_url_for_team(team))
 
         if self.include_traderumors:
-            #Code to all all team news to feed
-            self.feed_urls.append(self.__traderumors_url())
-
             if len(self.preferred_teams) > 0:
                 for team in self.preferred_teams:
                     self.feed_urls.append(self.__traderumors_url_for_team(team))
 
+        if self.include_mlb:
+            self.feed_urls.append(self.__mlb_url_for_team("MLB"))
+
+        if self.include_traderumors:
+            #Code to all all team news to feed
+            self.feed_urls.append(self.__traderumors_url())
+
         if self.include_joeblogs:
+            self.feed_urls.append(self.__athletic_mlb_url())
             self.feed_urls.append(self.__joeblogs_url())
+            #self.feed_urls.append(self.__athletic_golf_url())
+
 
     def __mlb_url_for_team(self, team_name):
         feed_name = MLB_FEEDS.get(team_name, None)
@@ -207,6 +217,16 @@ class Headlines:
             feed_name = MLB_FEEDS["MLB"]
 
         return "{}/{}/{}".format(MLB_BASE, feed_name, MLB_PATH)
+
+    def __athletic_golf_url(self):
+        feed_name = ATHLETIC_BASE
+        feed_path = ATHLETIC_GOLF_PATH
+        return "{}/{}".format(feed_name, feed_path)
+
+    def __athletic_mlb_url(self):
+        feed_name = ATHLETIC_BASE
+        feed_path = ATHLETIC_MLB_PATH
+        return "{}/{}".format(feed_name, feed_path)
 
     def __joeblogs_url(self):
         feed_name = JOE_BASE
