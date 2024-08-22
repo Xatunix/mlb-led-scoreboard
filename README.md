@@ -1,20 +1,42 @@
-# mlb-led-scoreboard-Xatunix changes
+# Implementation Notes
+- I do not have the expertise to advice on how to "install" this code. If you wish to use it, I recommend installing the scoreboard code using the primary repository, ensuring the scoreboard works with the base code, and then "adding" my custom files over the default ones
+- Files I changed can be identified by their association with a commit saying "Add files via upload"
+- My config files include an extra config value I added for additional news feeds (joeblogs). This will instantly break the scoreboard unless the relevant files implementing that are also added. This also means if those files implementing the extra config are added, but you try to use a standard config file, the scoreboard will not work. I will try to fix this in the future.
+- My coordinates files include extra values that will be ignored by the standard scoreboard. Other than that, they should be usable with the base code. There will be wonkiness with the innings indicator.
+
+GIFs (see README in "animtations" folder for more info
+- "Make" the led-image-viewer gif playing utility
+   - cd rpi-rgb-led-matrix directory
+   - sudo apt-get update
+   - sudo apt-get install libgraphicsmagick++-dev libwebp-dev -y
+   - cd utils
+   - make led-image-viewer
+- Move the "animation" folder into your "home" directory
+- Edit the "home" file path in renderers/game/gamep.py for gifs in antimation_gif function to match your home directory name
+
+# Xatunix changes
 News: 
-- Added to Joe Posnanski's Blog https://joeblogs.joeposnanski.com/ (and related configuration in .config file)
-- Added ALL team MLBTR news to display before specific team news (does not play with current values in .config file)
-- Modified some weather icons for baseballishness
-- Added a light boarder effect that shines the edges of the board (cycles on approximately every 5 minutes, then stays off for 10)
+- Changed news fetching to 15 minute intervals
+- Changed max number of stories to 7 per feed
+- Added today's date permanently to news screen
+- Added Joe Posnanski's Blog https://joeblogs.joeposnanski.com/ (and related configuration in .config files)
+- Added The Athletic MLB News (attached to MLB Trade Rumors configuration in .config file)
+- Added ALL team MLBTR news to display before specific team news (attached to MLB Trade Rumors configuration in .config file)
+- Modified some weather icons for baseballishness (Sun and Moon)
+- Coded but commented out: Added a light boarder effect that shines the edges of the board, different per day (cycles on approximately every 5 minutes, then stays off for 10)
 
 Standings:
 - Modified colors for readability
-   Usied bottom line of board (currently filled with background color) to indicate current standings being shown (Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
+-  Used bottom line of board (currently filled with background color) to indicate current standings being shown (AL = Left Half, NL = Right half, Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
 
-Game Display (background files):
+Game Display (background files data/plays.py, data/game.py):
+- Changed game refresh from default of 10 to 7 (found this increased play outputs)
 - Added play results for outs: Popout, Lineout, Flyout
+- Added play results for Stolen Bases, Hit Batters, and others
+- Added play results for Home Runs with multiple runners (unconfirmed if working)
 - Added distinction for hits that result in RBIs: Single_RBI, Double_RBI, Triple_RBI
-- Added Stolen Base
-- Changed many play names/abbreviations to work with my new layout
-- Changed many pitch type names/abbreviations to work with my new layout
+- Changed many play names/abbreviations to work with my layout
+- Changed many pitch type names/abbreviations to work with my layout
 - Created an /animations folder where .gif animations for many plays exist (triggered using matrix gif playing utility which must be installed)
 
 Game Display:
@@ -25,17 +47,23 @@ Game Display:
 - When a play result can be displayed, the count, pitch info, and pitch count disappear to make room for that info
 - Added .gif animations for many plays, triggered irregularly based on a random number (currently only compatible with 64x32)
   - (In Progress) Currently these overlap the play result readout. I'm trying to blank this out until the gif is done.
-- Added 7th inning stretch animations
+  - Added "Chance" variable at the top of the animation_gif method to control general gif occurance rate. Default .5, or 50% of time (increased slightly for uncommon plays, always occurs for Home Runs).
 - Added "ring of lights" flashing animation (in time with flashing of play display) for run scoring plays (using RBI definitions above)
 - Added "ring of lights" "crawling" animation for positive plays for the offense (hits)
 - Added "ring of lights" "chasing" animations for walks, steals, and hit by pitches
 - Added static "ring of lights" in red for Strikeouts
+
+Between Innings Display:
+- Commented Out via flag: Added scrolling compatibility for long names in-between innings
+- Removed "Due Up" text to give due up names more room (without scrolling)
+- Removed "Due Up" names when End of the 9th, since most games are over at this time, and Mid 7th, for 7th inning stretch gifs
+    - Future: Will only remove Due Up when game is NOT going into extra innings
+- Added 7th inning stretch animations (4)
 - Bug fix: The inning number wasn't playing nicely with my format after 9 innings, so I manually moved it a couple spaces to the left > 9 innings
-- Added scrolling for long names in-between innings
 
 Pre/PostGame Display:
 - Removed "ERA" and other extra spaces so not as much scrolling was needed to get through all info.
-- Removed some other info labels I deemed unnecessary in the scroll too
+- Removed some other info labels and delineators I deemed unnecessary in the scroll
 - Bug Fix: After the 9th inning, the ordinal version of the number "10th" ran into the divider line, so I removed the ordinal and just display the inning number >9
 
   Other:
