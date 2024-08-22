@@ -36,10 +36,10 @@ yo = 0
 zo = 0
 w = 0
 o = 0
-oo = 0
 agif = False
 
 def render_live_game(canvas, layout: Layout, colors: Color, scoreboard: Scoreboard, text_pos, animation_time):
+    global o
     pos = 0
     #if pos == 1:
     if scoreboard.inning.state == Inning.TOP or scoreboard.inning.state == Inning.BOTTOM:
@@ -69,17 +69,15 @@ def render_live_game(canvas, layout: Layout, colors: Color, scoreboard: Scoreboa
         _render_inning_break(canvas, layout, colors, scoreboard.inning)
 
         #Hde Due Up during 7th inning stretch animation (BUG: O not get reset for multipel games going into stretch
-        global o
-        #global oo
         #global agif
-        if (scoreboard.inning.number==7) and (scoreboard.inning.state=="Middle") and (o < 100):
+        #o = 100
+        if (scoreboard.inning.number==7) and (scoreboard.inning.state=="Middle") and (o < 110):
             o += 1
+        elif (scoreboard.inning.number==9) and (scoreboard.inning.state=="End"):
+            o += 1
+            #animation_gif("home_run")
         else:
             _render_due_up(canvas, layout, colors, scoreboard.atbat, text_pos)
-        #    oo += 1
-        #if (oo > 600):   #Problems resetting the seventh variables if back-to-back games with screen
-        #    o = 0
-        #    oo = 0
     return pos
 
 
@@ -118,7 +116,6 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
     global zo
     global w
     global o
-    global oo
     global agif
 
     #global lastplay
@@ -168,7 +165,6 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
         yo = 0
         zo = 0
         o = 0
-        oo = 0
         w = 0
         agif = False
 
@@ -190,86 +186,114 @@ def animation_gif(play_result):
     #sresults = list(SCORING)
     #othresults = list(OTHERS)
 
-    #print("Gif? " + play_result)
+    print("Play Gif? " + play_result, flush=True)
 
     home = "/home/bof"
     liv = home + "/mlb-led-scoreboard/rpi-rgb-led-matrix/utils/led-image-viewer"
+    chance = .5
 
     if play_result in skresults and agif==False:
         agif = True
         rdm = random()
-        if rdm < .15:
+        ch = chance/2
+        print("gif: so\n")
+        if rdm < ch:
             gifp = "/animations/so.gif"
             path = home + gifp
-            gif = subprocess.Popen([liv, "-l1", "-D600", "/home/bof/animations/so.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .15) and (rdm < 3):
-            gif = subprocess.Popen([liv, "-l1", "-D600", "/home/bof/animations/so2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            print("gif: so", flush=True)
+            gif = subprocess.Popen([liv, "-l1", "-D700", "/home/bof/animations/so.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch) and (rdm < chance):
+            print("gif: so2", flush=True)
+            gif = subprocess.Popen([liv, "-l1", "-D700", "/home/bof/animations/so2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "home_run" in play_result and agif==False:
         agif = True
         rdm = random()
-        if rdm <= .5:
+        if rdm < .5:
+            print("gif: fireworks", flush=True)
             gif = subprocess.Popen([liv, "-l2", "-D450", "/home/bof/animations/fireworks.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=4"])
         else:
+            print("gif: fireworks2", flush=True)
             gif = subprocess.Popen([liv, "-l3", "-D150", "/home/bof/animations/fireworks2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=4"])
     elif "walk" in play_result and agif==False:
         agif = True
         rdm = random()
-        if rdm < .15:
+        ch = chance/2
+        if rdm < ch:
+            print("gif: walk", flush=True)
             gif = subprocess.Popen([liv, "-l3", "-D1000", "/home/bof/animations/walk.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .15) and (rdm < .3):
+        elif (rdm >= ch) and (rdm < chance):
+            print("gif: baseonballs", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D700", "/home/bof/animations/baseonballs.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif rdm > .95:
+        elif rdm > .9:
+            print("gif: submarine", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D300", "/home/bof/animations/submarine.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "hit_by_pitch" in play_result and agif==False:
         agif = True
         rdm = random()
-        if rdm < .4:
+        if rdm < chance+.2:
+            print("gif: hbp")
             gif = subprocess.Popen([liv, "-l1", "-D800", "/home/bof/animations/hbp.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=4"])
-    elif "field_out_fly" in play_result and agif==False:
+    elif ("field_out_fly" in play_result) or ("field_out_pop" in play_result) and agif==False:
         agif = True
         rdm = random()
-        if rdm < .15:
-            gif = subprocess.Popen([liv, "-l1", "-D650", "/home/bof/animations/fly.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .15) and (rdm < .3):
+        ch = chance/2
+        if rdm < ch:
+            print("gif: fly")
+            gif = subprocess.Popen([liv, "-l1", "-D700", "/home/bof/animations/fly.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch) and (rdm < chance):
+            print("gif: corn")
             gif = subprocess.Popen([liv, "-l8", "-D400", "/home/bof/animations/corn.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .5) and (rdm < .55):
-            gif = subprocess.Popen([liv, "-l1", "-D600", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .55) and (rdm < .6):
-            gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        #elif (rdm >= .5) and (rdm < .6):
+            #print("gif: wave")
+            #gif = subprocess.Popen([liv, "-l1", "-D400", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        #elif (rdm >= .6) and (rdm < .7):
+            #print("gif: wave2")
+            #gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "field_out_ground" in play_result and agif==False:
         agif = True
         rdm = random()
-        if rdm <= .3:
+        ch = chance/2
+        if rdm < chance:
+            print("gif: grounder")
             gif = subprocess.Popen([liv, "-l1", "-D900", "/home/bof/animations/grounder.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .5) and (rdm < .55):
-            gif = subprocess.Popen([liv, "-l1", "-D600", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .55) and (rdm < .6):
-            gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        #elif (rdm >= .5) and (rdm < .6):
+            #print("gif: wave")
+            #gif = subprocess.Popen([liv, "-l1", "-D400", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        #elif (rdm >= .6) and (rdm < .7):
+            #print("gif: wave2")
+            #gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "field_out_line" in play_result and agif==False:
         agif = True
         rdm = random()
-        if rdm <= 0.15:
+        ch = chance/2
+        if rdm < ch:
+            print("gif: lineout")
             gif = subprocess.Popen([liv, "-l1", "-D700", "/home/bof/animations/lineout.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .15) and (rdm < .3):
-            gif = subprocess.Popen([liv, "-l1", "-D180", "/home/bof/animations/bullet.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .5) and (rdm < .55):
-            gif = subprocess.Popen([liv, "-l1", "-D600", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .55) and (rdm < .6):
-            gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch) and (rdm < chance):
+            print("gif: bullet")
+            gif = subprocess.Popen([liv, "-l1", "-D200", "/home/bof/animations/bullet.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        #elif (rdm >= .5) and (rdm < .6):
+            #print("gif: wave")
+            #gif = subprocess.Popen([liv, "-l1", "-D400", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        #elif (rdm >= .6) and (rdm < .7):
+            #print("gif: wave2")
+            #gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "sac_fly" in play_result and agif==False:
         agif = True
-        if random() <= .5:
+        if random() < chance+.2:
+            print("gif: sacfly")
             gif = subprocess.Popen([liv, "-l1", "-D1600", "/home/bof/animations/sacfly.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "stolen_base_home" in play_result and agif==False:
         agif = True
         rdm = random()
-        if rdm <= .5:
+        if rdm < .5:
             gif = subprocess.Popen([liv, "-l2", "-D450", "/home/bof/animations/fireworks.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=4"])
         else:
             gif = subprocess.Popen([liv, "-l3", "-D150", "/home/bof/animations/fireworks2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=4"])
     elif "stolen_base" in play_result and agif==False:
         agif = True
-        if random() <= .4:
+        if random() < chance+.2:
+            print("gif: sb")
             gif = subprocess.Popen([liv, "-l1", "-D800", "/home/bof/animations/sb.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "seventh" in play_result and agif==False:
         agif = True
@@ -285,23 +309,31 @@ def animation_gif(play_result):
     elif play_result not in oresults and agif==False:
         agif = True
         rdm = random()
-        if rdm < .1:
+        ch = (chance+.2)/8
+        if rdm < ch:
+            print("gif: Hclap")
             gif = subprocess.Popen([liv, "-l8", "-D350", "/home/bof/animations/clap.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .1) and (rdm < .2):
-            gif = subprocess.Popen([liv, "-l4", "-D350", "/home/bof/animations/super.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .2) and (rdm < .3):
-            gif = subprocess.Popen([liv, "-l4", "-D800", "/home/bof/animations/ao.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .3) and (rdm < .4):
-            gif = subprocess.Popen([liv, "-l1", "-D1100", "/home/bof/animations/charge.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif (rdm >= .4) and (rdm < .5):
+        elif (rdm >= ch) and (rdm < ch*2):
+            print("gif: Hsuper")
+            gif = subprocess.Popen([liv, "-l6", "-D350", "/home/bof/animations/super.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch*2) and (rdm < ch*3):
+            print("gif: Hao")
+            gif = subprocess.Popen([liv, "-l6", "-D850", "/home/bof/animations/ao.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch*3) and (rdm < ch*4):
+            print("gif: Hcharge")
+            gif = subprocess.Popen([liv, "-l1", "-D1200", "/home/bof/animations/charge.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch*4) and (rdm < ch*5):
+            print("gif: Hclap2")
             gif = subprocess.Popen([liv, "-l2", "-D180", "/home/bof/animations/clapletsgo.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        #elif (rdm >= .5) and (rdm < .55):
-            #gif = subprocess.Popen([liv, "-l1", "-D600", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        #elif (rdm >= .55) and (rdm < .6):
-            #gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-        elif rdm >= .9:
+        elif (rdm >= ch*5) and (rdm < ch*6):
+            print("gif: Hking")
             gif = subprocess.Popen([liv, "-l4", "-D1000", "/home/bof/animations/king.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-
+        elif (rdm >= ch*6) and (rdm < ch*7):
+            print("gif: Hwave")
+            gif = subprocess.Popen([liv, "-l1", "-D400", "/home/bof/animations/wave.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+        elif (rdm >= ch*7) and (rdm < ch*8):
+            print("gif: Hwave2")
+            gif = subprocess.Popen([liv, "-l2", "-D400", "/home/bof/animations/wave2.gif", "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
 
 def animation_ring(canvas, color):
     xMax = canvas.width
@@ -458,7 +490,6 @@ def animation_crown(canvas, colors):
         global zo
         global w
         global o
-        global oo
 
         color = colors.graphics_color("offday.time")
         color2 = colors.graphics_color("default.background")
@@ -534,7 +565,6 @@ def animation_crown(canvas, colors):
             yo = 0
             zo = 0
             o = 0
-            oo = 0
             w = 0
 
 
@@ -553,7 +583,6 @@ def animation_crown3(canvas, colors):
         global zo
         global w
         global o
-        global oo
 
         #color = colors.graphics_color("offday.time")
         color4 = colors.graphics_color("default.background")
@@ -696,7 +725,6 @@ def animation_crown3(canvas, colors):
             yo = 0
             zo = 0
             o = 0
-            oo = 0
             w = 0
 
 
@@ -979,7 +1007,10 @@ def _render_due_up(canvas, layout, colors, atbat: AtBat, text_pos):
     color = colors.graphics_color("inning.break.due_up_names")
     bgcolor = colors.graphics_color("default.background")
 
-    scroll = True
+    #29, 20-26-32,35
+    scroll = False
+    largeSpace = True
+
     if scroll:
         lead = scrollingtext.render_text(
             canvas,
@@ -1020,18 +1051,24 @@ def _render_due_up(canvas, layout, colors, atbat: AtBat, text_pos):
             center=False,
         )
     else:
-        graphics.DrawText(canvas, batter_font["font"], leadoff["x"], leadoff["y"], batter_color, atbat.batter)
-        graphics.DrawText(canvas, batter_font["font"], on_deck["x"], on_deck["y"], batter_color, atbat.onDeck)
-        graphics.DrawText(canvas, batter_font["font"], in_hole["x"], in_hole["y"], batter_color, atbat.inHole)
+        if largeSpace:
+            graphics.DrawText(canvas, batter_font["font"], leadoff["x"]-13, leadoff["y"], batter_color, atbat.batter)
+            graphics.DrawText(canvas, batter_font["font"], on_deck["x"]-13, on_deck["y"], batter_color, atbat.onDeck)
+            graphics.DrawText(canvas, batter_font["font"], in_hole["x"]-13, in_hole["y"], batter_color, atbat.inHole)
+        else:
+            graphics.DrawText(canvas, batter_font["font"], leadoff["x"], leadoff["y"], batter_color, atbat.batter)
+            graphics.DrawText(canvas, batter_font["font"], on_deck["x"], on_deck["y"], batter_color, atbat.onDeck)
+            graphics.DrawText(canvas, batter_font["font"], in_hole["x"], in_hole["y"], batter_color, atbat.inHole)
 
 
     due_font = layout.font("inning.break.due_up.due")
     due_color = colors.graphics_color("inning.break.due_up")
 
-    due = layout.coords("inning.break.due_up.due")
-    up = layout.coords("inning.break.due_up.up")
-    graphics.DrawText(canvas, due_font["font"], due["x"], due["y"], due_color, "Due")
-    graphics.DrawText(canvas, due_font["font"], up["x"], up["y"], due_color, "Up:")
+    if not largeSpace:
+        due = layout.coords("inning.break.due_up.due")
+        up = layout.coords("inning.break.due_up.up")
+        graphics.DrawText(canvas, due_font["font"], due["x"], due["y"], due_color, "Due")
+        graphics.DrawText(canvas, due_font["font"], up["x"], up["y"], due_color, "Up:")
 
     divider = layout.coords("inning.break.due_up.divider")
     if divider["draw"]:
