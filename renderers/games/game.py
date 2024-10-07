@@ -1052,7 +1052,7 @@ def _render_count(canvas, layout, colors, pitches: Pitches):
     bcolor = colors.graphics_color("standings.nl.divider")
 
     # Toggle between showing count at circles and numbers
-    cCount = True
+    cCount = False
 
     xMax = canvas.width
     xMin = 1
