@@ -106,7 +106,7 @@ class Headlines:
         self.include_preferred = config.news_ticker_preferred_teams
         self.include_traderumors = config.news_ticker_traderumors
         self.include_countdowns = config.news_ticker_countdowns
-        self.include_joeblogs = config.news_ticker_joeblogs
+        #self.include_joeblogs = config.news_ticker_joeblogs
         self.include_date = config.news_ticker_date
         self.date_format = config.news_ticker_date_format
         self.feed_urls = []
@@ -203,7 +203,10 @@ class Headlines:
             #Code to all all team news to feed
             self.feed_urls.append(self.__traderumors_url())
 
-        if self.include_joeblogs:
+        #CHANGE to enable/disable custom feeds
+        include_joeblogs = True
+        if True:
+        #if self.include_joeblogs:
             self.feed_urls.append(self.__athletic_mlb_url())
             self.feed_urls.append(self.__joeblogs_url())
             #self.feed_urls.append(self.__athletic_golf_url())
