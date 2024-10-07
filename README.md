@@ -1,17 +1,16 @@
 # Implementation Notes
-- I do not have the expertise to advice on how to "install" this code. If you wish to use it, I recommend installing the scoreboard code using the primary repository, ensuring the scoreboard works with the base code, and then "adding" my custom files over the default ones
+- I do not have the expertise to advice on how to "install" this code. If you wish to use it, I recommend installing the scoreboard code using the primary repository, ensuring the scoreboard works with the base code, and then "adding" my custom files over the default ones.
 - Files I changed can be identified by their association with a commit saying "Add files via upload"
-- My config files include an extra config value I added for additional news feeds (joeblogs). This will instantly break the scoreboard unless the relevant files implementing that are also added. This also means if those files implementing the extra config are added, but you try to use a standard config file, the scoreboard will not work. I will try to fix this in the future.
-- My coordinates files include extra values that will be ignored by the standard scoreboard. Other than that, they should be usable with the base code. There will be wonkiness with the innings indicator.
+- My config files include an extra config value I added for additional news feeds (joeblogs). This will instantly break a default scoreboard unless the relevant files implementing that are also added. Do NOT use my config files. They have been added to show how my iOS shortcut below works.
+- My coordinates and colors files include extra values that will be ignored by the standard scoreboard. Other than that, they should be usable with the base code. There will be wonkiness with the innings indicator.
 
-GIFs (see README in "animtations" folder for more info
+GIFs (see README in "assets/animations" folder for more info
 - "Make" the led-image-viewer gif playing utility
    - cd rpi-rgb-led-matrix directory
    - sudo apt-get update
    - sudo apt-get install libgraphicsmagick++-dev libwebp-dev -y
    - cd utils
    - make led-image-viewer
-- Move the "animation" folder into your "home" directory
 - Edit the "home" file path in renderers/game/gamep.py for gifs in antimation_gif function to match your home directory name
 
 # Xatunix changes
@@ -19,15 +18,15 @@ News:
 - Changed news fetching to 15 minute intervals
 - Changed max number of stories to 7 per feed
 - Added today's date permanently to news screen
-- Added Joe Posnanski's Blog https://joeblogs.joeposnanski.com/ (and related configuration in .config files)
+- Added Joe Posnanski's Blog https://joeblogs.joeposnanski.com/ (and related configuration in .config files) (DISABLED CURRENTLY)
 - Added The Athletic MLB News (attached to MLB Trade Rumors configuration in .config file)
 - Added ALL team MLBTR news to display before specific team news (attached to MLB Trade Rumors configuration in .config file)
 - Modified some weather icons for baseballishness (Sun and Moon)
-- Coded but commented out: Added a light boarder effect that shines the edges of the board, different per day (cycles on approximately every 5 minutes, then stays off for 10)
+- Coded but commented out: Added a light boarder effect that shines the edges of the board, different per day (cycles on approximately every 5 minutes, then stays off for 10) (DISABLED CURRENTLY)
 
 Standings:
 - Modified colors for readability
--  Used bottom line of board (currently filled with background color) to indicate current standings being shown (AL = Left Half, NL = Right half, Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
+- Used bottom line of board (currently filled with background color) to indicate current standings being shown (AL = Left Half, NL = Right half, Color on Left side = West, Middle = Central, Right = East, Dotted line = WC)
 
 Game Display (background files data/plays.py, data/game.py):
 - Changed game refresh from default of 10 to 7 (found this increased play outputs)
@@ -37,7 +36,8 @@ Game Display (background files data/plays.py, data/game.py):
 - Added distinction for hits that result in RBIs: Single_RBI, Double_RBI, Triple_RBI
 - Changed many play names/abbreviations to work with my layout
 - Changed many pitch type names/abbreviations to work with my layout
-- Created an /animations folder where .gif animations for many plays exist (triggered using matrix gif playing utility which must be installed)
+- Created an /assets/animations folder where .gif animations for many plays exist (triggered using matrix gif playing utility which must be installed)
+- Added ability to display balls/strikes with circles instead of numbers (DISABLED, look for "cCount" booleon and set to "True" to re-enable)
 
 Game Display:
 - Moved the batter/pitcher info to the left so "AB:" "P:" are not taking up space
@@ -59,6 +59,8 @@ Between Innings Display:
 - Removed "Due Up" names when End of the 9th, since most games are over at this time, and Mid 7th, for 7th inning stretch gifs
     - Future: Will only remove Due Up when game is NOT going into extra innings
 - Added 7th inning stretch animations (4)
+- Added Top/Bottom arrow so it is clear which team is coming up next
+- Added code to allow for Scrolling of up-next batter names if desired (CURRENT DISABLED, look for booleon in game.py. Will require coordinates edits to function properly if re-enabled)
 - Bug fix: The inning number wasn't playing nicely with my format after 9 innings, so I manually moved it a couple spaces to the left > 9 innings
 
 Pre/PostGame Display:
