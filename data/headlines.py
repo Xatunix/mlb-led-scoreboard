@@ -208,7 +208,7 @@ class Headlines:
         if True:
         #if self.include_joeblogs:
             self.feed_urls.append(self.__athletic_mlb_url())
-            self.feed_urls.append(self.__joeblogs_url())
+            #self.feed_urls.append(self.__joeblogs_url())
             #self.feed_urls.append(self.__athletic_golf_url())
 
 
