@@ -32,7 +32,8 @@ class Config:
         self.news_ticker_preferred_teams = json["news_ticker"]["preferred_teams"]
         self.news_ticker_traderumors = json["news_ticker"]["traderumors"]
         self.news_ticker_mlb_news = json["news_ticker"]["mlb_news"]
-        self.news_ticker_joeblogs = json["news_ticker"]["joeblogs"]
+        #CUSTOM Configs
+        #self.news_ticker_joeblogs = json["news_ticker"]["joeblogs"]
         self.news_ticker_countdowns = json["news_ticker"]["countdowns"]
         self.news_ticker_date = json["news_ticker"]["date"]
         self.news_ticker_date_format = json["news_ticker"]["date_format"]
