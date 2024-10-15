@@ -75,7 +75,7 @@ def render_live_game(canvas, layout: Layout, colors: Color, scoreboard: Scoreboa
 
         #Hide Due Up during 7th inning stretch animation (BUG: b not get reset for multiple games between innings going into stretch (only reset when showing active game)
         global b
-        if (scoreboard.inning.number==7) and (scoreboard.inning.state=="Middle") and (b < 110):
+        if (scoreboard.inning.number==7) and (scoreboard.inning.state=="Middle") and (b < 120):
             b += 1
         else:
             _render_due_up(canvas, layout, colors, scoreboard.atbat, text_pos)
@@ -134,7 +134,6 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
             animation_gif(play_result)
 
         if "home_run" in play_result:
-            #animation_chase(canvas, colors)
             animation_crown3(canvas, colors)
         elif (play_result in wresults) and (play_result not in sresults):
             animation = 1
@@ -143,7 +142,6 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
             animation = 1
         elif (play_result not in sresults) and (play_result not in oresults) and (play_result not in skresults):
             animation = 1
-            #animation_chase(canvas, colors)
             animation_crown(canvas, colors)
 
         if animation:
@@ -166,7 +164,7 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
 
         #CHANGE gif blanking time
         b += 1    
-        if (b < 95 and pgif==True):
+        if (b >= 25 and b < 115 and pgif==True):
             for i in range (yMin, yMax):
                 graphics.DrawLine(canvas, xMin, i, xS, i, bgcolor)
 
@@ -205,6 +203,7 @@ def animation_gif(play_result):
     global agif
     #pgif tells the scoreboard a gif has been played, so do required things (blank the space)
     global pgif
+    global b
     #results = list(PLAY_RESULTS.keys())
     #hresults = list(HITS)
     #wresults = list(WALKS)
@@ -223,6 +222,9 @@ def animation_gif(play_result):
 
     #DISABLE TO CLEAN UP LOGS
     #print("Play Gif? " + play_result, flush=True)
+
+    if b < 25:
+        return
 
     if play_result in skresults and agif==False:
         agif = True
@@ -315,13 +317,13 @@ def animation_gif(play_result):
             g = home + gifp
             pgif = True
             print("gif: pop2", flush=True)
-            gif = subprocess.Popen([liv, "-l1", "-D900", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l1", "-D850", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < ch*2):
             gifp = "/mlb-led-scoreboard/assets/animations/pop.gif"
             g = home + gifp
             pgif = True
             print("gif: pop", flush=True)
-            gif = subprocess.Popen([liv, "-l1", "-D500", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
     elif "field_out_ground" in play_result and agif==False:
         agif = True
         rdm = random()
@@ -437,7 +439,7 @@ def animation_gif(play_result):
             g = home + gifp
             pgif = True
             print("gif: Hclap", flush=True)
-            gif = subprocess.Popen([liv, "-l8", "-D350", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l7", "-D350", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < ch*2):
             gifp = "/mlb-led-scoreboard/assets/animations/super.gif"
             g = home + gifp
@@ -449,7 +451,7 @@ def animation_gif(play_result):
             g = home + gifp
             pgif = True
             print("gif: Hao", flush=True)
-            gif = subprocess.Popen([liv, "-l6", "-D830", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l4", "-D830", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*3) and (rdm < ch*4):
             gifp = "/mlb-led-scoreboard/assets/animations/charge.gif"
             g = home + gifp
@@ -467,7 +469,7 @@ def animation_gif(play_result):
             g = home + gifp
             pgif = True
             print("gif: Hking", flush=True)
-            gif = subprocess.Popen([liv, "-l4", "-D1000", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l3", "-D1000", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*6) and (rdm < ch*7):
             gifp = "/mlb-led-scoreboard/assets/animations/wave.gif"
             g = home + gifp
