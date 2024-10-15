@@ -37,7 +37,6 @@ Game Display (background files data/plays.py, data/game.py):
 - Changed many play names/abbreviations to work with my layout
 - Changed many pitch type names/abbreviations to work with my layout
 - Created an /assets/animations folder where .gif animations for many plays exist (triggered using matrix gif playing utility which must be installed)
-- Added ability to display balls/strikes with circles instead of numbers (DISABLED, look for "cCount" booleon and set to "True" to re-enable)
 
 Game Display:
 - Moved the batter/pitcher info to the left so "AB:" "P:" are not taking up space
@@ -52,6 +51,7 @@ Game Display:
 - Added "ring of lights" "crawling" animation for positive plays for the offense (hits)
 - Added "ring of lights" "chasing" animations for walks, steals, and hit by pitches
 - Added static "ring of lights" in red for Strikeouts
+- Added ability to display balls/strikes with circles instead of numbers (DISABLED, look for "cCount" booleon and set to "True" to re-enable)
 
 Between Innings Display:
 - Commented Out via flag: Added scrolling compatibility for long names in-between innings
@@ -79,6 +79,7 @@ Pre/PostGame Display:
     - -Shutdown: Shutdown pi
   - Created many versions of the .config file to be copied around when using the iOS shortcut (See above)
   - Colors: Used someone else's "official colors" files I found. Made some personal aesthetic-based changes (KC, AZ, MIA, AL, NL)
+  - Colors: Created additional teams/scoreboard colors files to make the scoreboard look closer to fenway park (best used with Count Circles (cCount) option above!)
     
 
 
