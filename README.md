@@ -68,8 +68,8 @@ Pre/PostGame Display:
 - Removed some other info labels and delineators I deemed unnecessary in the scroll
 - Bug Fix: After the 9th inning, the ordinal version of the number "10th" ran into the divider line, so I removed the ordinal and just display the inning number >9
 
-  Other:
-  - Wrote iOS shortcut for easier control of scoreboard at any given time: https://www.icloud.com/shortcuts/0724f816a6214c8e8d5adbe7c8a77d88
+Other:
+- Wrote iOS shortcut for easier control of scoreboard at any given time: https://www.icloud.com/shortcuts/0724f816a6214c8e8d5adbe7c8a77d88
     - Live games: Only currently-active games (config.json_live)
     - All Games: All games current and ended (config.json_standard)
     - News: Forces the news screen (config.json_news)
@@ -77,9 +77,9 @@ Pre/PostGame Display:
     - KC Royals: Loads a file with the favorite team in the config, so it will default to that game, rotating to other games during inning breaks (I broke this out to access my favorite team easily)
     - Select Team > ATL/BAL/TOR/etc.: Same as above, but every team (config.json_live_atl, config.json_live_bal, config.json_live_kc, etc. I did all of them.)
     - -Shutdown: Shutdown pi
-  - Created many versions of the .config file to be copied around when using the iOS shortcut (See above)
-  - Colors: Used someone else's "official colors" files I found. Made some personal aesthetic-based changes (KC, AZ, MIA, AL, NL)
-  - Colors: Created additional teams/scoreboard colors files to make the scoreboard look closer to fenway park (best used with Count Circles (cCount) option above!)
+- Created many versions of the .config file to be copied around when using the iOS shortcut (See above)
+- Colors: Used someone else's "official colors" files I found for team colors. Made some personal aesthetic-based changes (there are too many blue/red teams!)  (KC, AZ, MIA, OAK, CLE, AL, NL)
+- Colors: Created additional teams/scoreboard colors files to make the scoreboard look closer to fenway park (best used with Count Circles (cCount) option above!)
     
 
 
