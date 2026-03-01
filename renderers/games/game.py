@@ -21,7 +21,6 @@ import subprocess
 from random import random
 #from renderers.games import teams
 
-#lastplay = ""
 x = 0
 y = 0
 z = 0
@@ -34,14 +33,21 @@ zzz = 0
 xo = 0
 yo = 0
 zo = 0
-w = 0
-o = 0
-b = 0
-agif = False
-pgif = False
-cgif = False
+wait = 0
+off = 0
+blankt = 0
+
+tryAn = False
+playAn = False
+playAn2 = False
+fblank = False
+
+anOnly = False
+
+#lastplay = ""
 
 def render_live_game(canvas, layout: Layout, colors: Color, scoreboard: Scoreboard, text_pos, animation_time):
+    global anOnly
     pos = 0
     if scoreboard.inning.state == Inning.TOP or scoreboard.inning.state == Inning.BOTTOM:
         pos = _render_at_bat(
@@ -61,22 +67,23 @@ def render_live_game(canvas, layout: Layout, colors: Color, scoreboard: Scoreboa
             if layout.state_is_nohitter():
                 nohitter.render_nohit_text(canvas, layout, colors)
 
-        # _render_count(canvas, layout, colors, scoreboard.pitches)
-        _render_outs(canvas, layout, colors, scoreboard.outs)
-        _render_bases(canvas, layout, colors, scoreboard.bases, scoreboard.homerun(), (animation_time % 16) // 5)
-        _render_inning_display(canvas, layout, colors, scoreboard.inning)
+        if not anOnly:
+            # _render_count(canvas, layout, colors, scoreboard.pitches)
+            _render_outs(canvas, layout, colors, scoreboard.outs)
+            _render_bases(canvas, layout, colors, scoreboard.bases, scoreboard.homerun(), (animation_time % 16) // 5)
+            _render_inning_display(canvas, layout, colors, scoreboard.inning)
 
     else:
         #Reset mid-play situation bgif
-        global cgif
-        cgif = False
+        global playAn2
+        playAn2 = False
 
         _render_inning_break(canvas, layout, colors, scoreboard.inning)
 
-        #Hide Due Up during 7th inning stretch animation (BUG: b not get reset for multiple games between innings going into stretch (only reset when showing active game)
-        global b
-        if (scoreboard.inning.number==7) and (scoreboard.inning.state=="Middle") and (b < 120):
-            b += 1
+        #Hide Due Up during 7th inning stretch animation (BUG: blankt not get reset for multiple games between innings going into stretch (only reset when showing active game)
+        global blankt
+        if (scoreboard.inning.number==7) and (scoreboard.inning.state=="Middle") and (blankt < 120):
+            blankt += 1
         else:
             _render_due_up(canvas, layout, colors, scoreboard.atbat, text_pos)
 
@@ -85,7 +92,31 @@ def render_live_game(canvas, layout: Layout, colors: Color, scoreboard: Scoreboa
 
 # --------------- at-bat ---------------
 def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, animation, pitches: Pitches):
-    blength = __render_batter_text(canvas, layout, colors, atbat.batter, text_pos)
+    global x
+    global y
+    global z
+    global xx
+    global yy
+    global zz
+    global xxx
+    global yyy
+    global zzz
+    global xo
+    global yo
+    global zo
+    global wait
+    global off
+    global blankt
+    global tryAn
+    global playAn
+    global playAn2
+    global fblank
+    global anOnly
+
+    if not anOnly:
+        blength = __render_batter_text(canvas, layout, colors, atbat.batter, text_pos)
+    else:
+        blength = 1
 
     # print(str(blength))
     # __render_pitch_text(canvas, layout, colors, pitches)
@@ -101,26 +132,11 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
 
     #__render_play_result(canvas, layout, colors, play_result)
 
-    plength = __render_pitcher_text(canvas, layout, colors, atbat.pitcher, pitches, text_pos)
-    #print(str(plength))
-
-    global x
-    global y
-    global z
-    global xx
-    global yy
-    global zz
-    global xxx
-    global yyy
-    global zzz
-    global xo
-    global yo
-    global zo
-    global w
-    global o
-    global b
-    global agif
-    global pgif
+    if not anOnly:
+        plength = __render_pitcher_text(canvas, layout, colors, atbat.pitcher, pitches, text_pos)
+        #print(str(plength))
+    else:
+        plength = 1
 
     #global lastplay
     #lastplay = play_result
@@ -130,43 +146,25 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
     if play_result in results and __should_render_play_result(play_result, layout):
         #print("Play result in results and should render: " + play_result + ", Animation=" + str(animation) + " blength=" + str(blength))
 
-        if agif==False: 
+        if tryAn==False: 
             animation_gif(play_result)
-
         if "home_run" in play_result:
             animation_crown3(canvas, colors)
-        elif (play_result in wresults) and (play_result not in sresults):
+        elif (play_result in wresults) and (play_result not in sresults):  #Animation settings for walks (nonscoring)
             animation = 1
             animation_chase(canvas, colors)
-        elif (play_result in oresults) or (play_result in skresults):
+        elif (play_result in oresults) or (play_result in skresults):  #Animation settings for outs and strikeouts
             animation = 1
-        elif (play_result not in sresults) and (play_result not in oresults) and (play_result not in skresults):
+        elif (play_result not in sresults) and (play_result not in oresults) and (play_result not in skresults):  #Animation settings for nonscoring, nonout, nonK plays
             animation = 1
             animation_crown(canvas, colors)
 
         if animation:
             __render_play_result(canvas, layout, colors, play_result)
 
-        #Blank space for gif (must be after play display code
-        bgcolor = colors.graphics_color("default.background")
-        #tcolor = colors.graphics_color("standings.al.divider")
-        xMax = canvas.width
-        xMin = 1
-        fblank = False
-
-        yMin = 20 #14 21-26
-        yMax = yMin+6
-        xS = xMax-19
-
-        if fblank is True:
-            yMin = 13
-            yMax = canvas.height
-
-        #CHANGE gif blanking time
-        b += 1    
-        if (b >= 25 and b < 115 and pgif==True):
-            for i in range (yMin, yMax):
-                graphics.DrawLine(canvas, xMin, i, xS, i, bgcolor)
+        blankt += 1    
+        if (blankt >= 25 and blankt < 115 and playAn==True):
+            render_blank(canvas, layout, colors)
 
         return plength
         #return max(plength, blength)
@@ -183,27 +181,30 @@ def _render_at_bat(canvas, layout, colors, atbat: AtBat, text_pos, play_result, 
         xo = 0
         yo = 0
         zo = 0
-        o = 0
-        w = 0
-        b = 0
-        agif = False
-        pgif = False
+        off = 0
+        wait = 0
+        blankt = 0
+        tryAn = False
+        playAn = False
+        fblank = False
 
         #blength = __render_batter_text(canvas, layout, colors, atbat.batter, text_pos)
 
-        __render_pitch_text(canvas, layout, colors, pitches)
-        __render_pitch_count(canvas, layout, colors, pitches)
-        _render_count(canvas, layout, colors, pitches)
+        if not anOnly:
+            __render_pitch_text(canvas, layout, colors, pitches)
+            __render_pitch_count(canvas, layout, colors, pitches)
+            _render_count(canvas, layout, colors, pitches)
 
         return max(plength, blength)
 
 
 def animation_gif(play_result):
-    #agif ensures the gif playing utility and randomizer is only called once
-    global agif
-    #pgif tells the scoreboard a gif has been played, so do required things (blank the space)
-    global pgif
-    global b
+    #tryAn ensures the gif playing utility and randomizer is only called once
+    global tryAn
+    #playAn tells the scoreboard a gif has been played, so do required things (blank the space)
+    global playAn
+    global blankt
+    global fblank
     #results = list(PLAY_RESULTS.keys())
     #hresults = list(HITS)
     #wresults = list(WALKS)
@@ -216,34 +217,34 @@ def animation_gif(play_result):
     home = "/home/bof"
 
     #CHANGE depending on desired amount of animations. Bonuses given to infrequent plays, so change to -1 to turn off completely!
-    chance = .5
+    chance = 0.5
 
     liv = home + "/mlb-led-scoreboard/rpi-rgb-led-matrix/utils/led-image-viewer"
 
     #DISABLE TO CLEAN UP LOGS
     #print("Play Gif? " + play_result, flush=True)
 
-    if b < 25:
+    if blankt < 25 and "seventh" not in play_result:
         return
 
-    if play_result in skresults and agif==False:
-        agif = True
+    if play_result in skresults and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = chance/2
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/so.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: so", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < chance):
             gifp = "/mlb-led-scoreboard/assets/animations/so2.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: so2", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "home_run" in play_result and agif==False:
-        agif = True
+    elif "home_run" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         if rdm < .5:
             gifp = "/mlb-led-scoreboard/assets/animations/fireworks.gif"
@@ -255,132 +256,132 @@ def animation_gif(play_result):
             g = home + gifp
             print("gif: fireworks2", flush=True)
             gif = subprocess.Popen([liv, "-l3", "-D160", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "walk" in play_result and agif==False:
-        agif = True
+    elif "walk" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = chance/2
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/walk.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: walk", flush=True)
             gif = subprocess.Popen([liv, "-l3", "-D1000", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < chance):
             gifp = "/mlb-led-scoreboard/assets/animations/walk2.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: baseonballs", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif rdm > .95:
             gifp = "/mlb-led-scoreboard/assets/animations/walk3.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: submarine", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D400", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "hit_by_pitch" in play_result and agif==False:
-        agif = True
+    elif "hit_by_pitch" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         if rdm < chance+.2:
             gifp = "/mlb-led-scoreboard/assets/animations/hbp.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: hbp", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D800", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=5"])
-    elif "field_out_fly" in play_result and agif==False:
-        agif = True
+    elif "field_out_fly" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = chance/3
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/fly.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: fly", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < ch*2):
             gifp = "/mlb-led-scoreboard/assets/animations/corn.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: corn", flush=True)
-            gif = subprocess.Popen([liv, "-l5", "-D500", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l4", "-D500", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*2) and (rdm < ch*3):
             gifp = "/mlb-led-scoreboard/assets/animations/lazy.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: lazy", flush=True)
             gif = subprocess.Popen([liv, "-l3", "-D1500", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "field_out_pop" in play_result and agif==False:
-        agif = True
+    elif "field_out_pop" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = chance/2
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/pop2.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: pop2", flush=True)
-            gif = subprocess.Popen([liv, "-l1", "-D850", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+            gif = subprocess.Popen([liv, "-l1", "-D650", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < ch*2):
             gifp = "/mlb-led-scoreboard/assets/animations/pop.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: pop", flush=True)
-            gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "field_out_ground" in play_result and agif==False:
-        agif = True
+            gif = subprocess.Popen([liv, "-l1", "-D600", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+    elif "field_out_ground" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = chance/3
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/grounder.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: grounder", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D800", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < ch*2):
             gifp = "/mlb-led-scoreboard/assets/animations/grounder2.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: grounder2", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D800", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*2) and (rdm < ch*3):
             gifp = "/mlb-led-scoreboard/assets/animations/grounder3.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: grounder3", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D640", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "field_out_line" in play_result and agif==False:
-        agif = True
+    elif "field_out_line" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = chance/2
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/lineout.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: lineout", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D700", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < chance):
             gifp = "/mlb-led-scoreboard/assets/animations/bullet.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: bullet", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D450", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "double_play" in play_result and agif==False:
-        agif = True
+    elif "double_play" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
-        if rdm < chance + .2:
+        if rdm < chance + .25:
             gifp = "/mlb-led-scoreboard/assets/animations/dp.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: 643", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D1000", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "sac_fly" in play_result and agif==False:
-        agif = True
+    elif "sac_fly" in play_result and tryAn==False:
+        tryAn = True
         if random() < chance+.2:
             gifp = "/mlb-led-scoreboard/assets/animations/sacfly.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: sacfly", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D1750", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "stolen_base_home" in play_result and agif==False:
-        agif = True
+    elif "stolen_base_home" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         if rdm < .5:
             gifp = "/mlb-led-scoreboard/assets/animations/fireworks.gif"
@@ -390,16 +391,16 @@ def animation_gif(play_result):
             gifp = "/mlb-led-scoreboard/assets/animations/fireworks2.gif"
             g = home + gifp
             gif = subprocess.Popen([liv, "-l3", "-D160", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=70", "--led-slowdown-gpio=4"])
-    elif "stolen_base" in play_result and agif==False:
-        agif = True
+    elif "stolen_base" in play_result and tryAn==False:
+        tryAn = True
         if random() < chance+.2:
             gifp = "/mlb-led-scoreboard/assets/animations/sb.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: sb", flush=True)
-            gif = subprocess.Popen([liv, "-l1", "-D650", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "seventh" in play_result and agif==False:
-        agif = True
+            gif = subprocess.Popen([liv, "-l1", "-D550", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
+    elif "seventh" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
         if rdm < .25:
             gifp = "/mlb-led-scoreboard/assets/animations/seventh.gif"
@@ -421,65 +422,66 @@ def animation_gif(play_result):
             g = home + gifp
             print("gif: seventh4", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D600", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif "ducks" in play_result and agif==False:
-        agif = True
+    elif "ducks" in play_result and tryAn==False:
+        tryAn = True
         rdm = random()
-        if rdm < chance:
+        if rdm < chance + .2:
             gifp = "/mlb-led-scoreboard/assets/animations/ducks.gif"
             g = home + gifp
-            pgif = True
-            print("gif: seventh1", flush=True)
+            playAn = True
+            print("gif: ducks", flush=True)
             gif = subprocess.Popen([liv, "-l4", "-D900", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
-    elif play_result not in oresults and agif==False:
-        agif = True
+    elif play_result not in oresults and tryAn==False:
+        tryAn = True
         rdm = random()
         ch = (chance+.1)/8
         if rdm < ch:
             gifp = "/mlb-led-scoreboard/assets/animations/clap.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hclap", flush=True)
             gif = subprocess.Popen([liv, "-l7", "-D350", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch) and (rdm < ch*2):
             gifp = "/mlb-led-scoreboard/assets/animations/super.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
+            fblank = True
             print("gif: Hsuper", flush=True)
             gif = subprocess.Popen([liv, "-l5", "-D360", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*2) and (rdm < ch*3):
             gifp = "/mlb-led-scoreboard/assets/animations/ao.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hao", flush=True)
             gif = subprocess.Popen([liv, "-l4", "-D830", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*3) and (rdm < ch*4):
             gifp = "/mlb-led-scoreboard/assets/animations/charge.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hcharge", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D1200", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*4) and (rdm < ch*5):
             gifp = "/mlb-led-scoreboard/assets/animations/clapletsgo.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hclap2", flush=True)
             gif = subprocess.Popen([liv, "-l2", "-D180", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*5) and (rdm < ch*6):
             gifp = "/mlb-led-scoreboard/assets/animations/king.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hking", flush=True)
             gif = subprocess.Popen([liv, "-l3", "-D1000", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*6) and (rdm < ch*7):
             gifp = "/mlb-led-scoreboard/assets/animations/wave.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hwave", flush=True)
             gif = subprocess.Popen([liv, "-l1", "-D400", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
         elif (rdm >= ch*7) and (rdm < ch*8):
             gifp = "/mlb-led-scoreboard/assets/animations/wave2.gif"
             g = home + gifp
-            pgif = True
+            playAn = True
             print("gif: Hwave2", flush=True)
             gif = subprocess.Popen([liv, "-l2", "-D400", g, "--led-gpio-mapping=adafruit-hat", "--led-rows=32", "--led-cols=64", "--led-brightness=55", "--led-slowdown-gpio=4"])
 
@@ -537,8 +539,8 @@ def animation_chase(canvas, colors):
         global xo
         global yo
         global zo
-        global w
-        global o
+        global wait
+        global off
 
         color = colors.graphics_color("offday.time")
         color0 = colors.graphics_color("default.background")
@@ -557,8 +559,8 @@ def animation_chase(canvas, colors):
         i = 3
 
         if (xMin == 0):
-            if (w >= 20):
-                w += 1
+            if (wait >= 20):
+                wait += 1
                 for x in range (xMin, xMax):
                     if (x % i) > 0:
                         graphics.DrawLine(canvas, x+2, yS, x+2, yS, color0)
@@ -573,10 +575,10 @@ def animation_chase(canvas, colors):
                     else:
                         graphics.DrawLine(canvas, xMin, y+1, xMin, y+1, color)
                         graphics.DrawLine(canvas, xS, y-1, xS, y-1, color)
-                if (w > 29):
-                    w = 0
-            elif (w >= 10):
-                w += 1
+                if (wait > 29):
+                    wait = 0
+            elif (wait >= 10):
+                wait += 1
                 for x in range (xMin, xMax):
                     if (x % i) > 0:
                         graphics.DrawLine(canvas, x+1, yS, x+1, yS, color0)
@@ -592,7 +594,7 @@ def animation_chase(canvas, colors):
                         graphics.DrawLine(canvas, xMin, y, xMin, y, color)
                         graphics.DrawLine(canvas, xS, y, xS, y, color)
             else:
-                w += 1
+                wait += 1
                 for x in range (xMin, xMax):
                     if (x % i) > 0:
                         graphics.DrawLine(canvas, x, yS, x, yS, color0)
@@ -622,8 +624,8 @@ def animation_crown(canvas, colors):
         global xo
         global yo
         global zo
-        global w
-        global o
+        global wait
+        global off
 
         color = colors.graphics_color("offday.time")
         color2 = colors.graphics_color("default.background")
@@ -650,8 +652,8 @@ def animation_crown(canvas, colors):
 
             graphics.DrawLine(canvas, xMin, yMin, z, yMin, color)
             graphics.DrawLine(canvas, xS, yMin, xS-z, yMin, color)
-        elif w < 0:
-            w += 1
+        elif wait < 0:
+            wait += 1
             graphics.DrawLine(canvas, xH-x, yS, x+xH, yS, color)
             graphics.DrawLine(canvas, xMin, yS-y, xMin, yS, color)
             graphics.DrawLine(canvas, xS, yS-y, xS, yS, color)
@@ -698,8 +700,8 @@ def animation_crown(canvas, colors):
             xo = 0
             yo = 0
             zo = 0
-            o = 0
-            w = 0
+            off = 0
+            wait = 0
 
 
 def animation_crown3(canvas, colors):
@@ -715,8 +717,8 @@ def animation_crown3(canvas, colors):
         global xo
         global yo
         global zo
-        global w
-        global o
+        global wait
+        global off
 
         #color = colors.graphics_color("offday.time")
         color4 = colors.graphics_color("default.background")
@@ -843,8 +845,8 @@ def animation_crown3(canvas, colors):
 
             graphics.DrawLine(canvas, 0, yMin, zo, yMin, color4)
             graphics.DrawLine(canvas, xS, yMin, xS-zo, yMin, color4)
-        elif o <= 1000:
-            o += 1
+        elif off <= 1000:
+            off += 1
         else:
             x = 0
             y = 0
@@ -858,12 +860,35 @@ def animation_crown3(canvas, colors):
             xo = 0
             yo = 0
             zo = 0
-            o = 0
-            w = 0
+            off = 0
+            wait = 0
+
+
+def render_blank(canvas, layout, colors):
+    #Blank space for gif (must be after play display code)
+
+    bgcolor = colors.graphics_color("default.background")
+    #tcolor = colors.graphics_color("standings.al.divider")
+
+    xMax = canvas.width
+    xMin = 1
+    xS = xMax-19
+
+    global fblank
+    if fblank is True:
+        yMin = 15
+        yMax = canvas.height - 1
+    else:
+        yMin = 20 #14 21-26
+        yMax = yMin + 6
+ 
+    for i in range (yMin, yMax):
+        graphics.DrawLine(canvas, xMin, i, xS, i, bgcolor)
 
 
 def __should_render_play_result(play_result, layout):
     #print("Render? " + play_result)
+    
     if "strikeout" in play_result:
         coords = layout.coords("atbat.strikeout")
     else:
@@ -914,7 +939,8 @@ def __render_play_result(canvas, layout, colors, play_result):
     except KeyError:
         return
 
-    graphics.DrawText(canvas, font["font"], coords["x"], coords["y"], color, text)
+    if not anOnly:
+        graphics.DrawText(canvas, font["font"], coords["x"], coords["y"], color, text)
 
 
 def __render_batter_text(canvas, layout, colors, batter, text_pos):
@@ -1004,21 +1030,42 @@ def _render_bases(canvas, layout, colors, bases: Bases, home_run, animation):
     base_px.append(layout.coords("bases.2B"))
     base_px.append(layout.coords("bases.3B"))
 
+    #!!!!!!!!!!!!Setting if to display base outline if empty, detect theme by color compare
+
+    eBase = True
+
+    #Pitcher pitches color equal BG during Fenway theme
+    #pcColor = colors.graphics_color("atbat.pitch_count")
+    #bgColor = colors.graphics_color("default.background")
+
+    #print (bgColor)
+    #if (colors.atbat.pitch_count == colors.default.background):
+    #    eBase = False
+    #else:
+    #    eBase = False
+
     for base in range(len(base_runners)):
         __render_base_outline(canvas, base_px[base], base_colors[base])
 
         # Fill in the base if there's currently a baserunner or cycle if theres a homer
         if base_runners[base] or (home_run and animation == base):
             __render_baserunner(canvas, base_px[base], base_colors[base])
+        else:
+            if eBase != True:
+                 base_off = colors.graphics_color("default.background")
+                 __render_baseoff(canvas, base_px[base], base_off)
+            #else: CODE TO blank THE INSIDE OF BASES WITH BASE OFF COLOR
+            #     base_off = colors.graphics_color("bases.off")
+            #     __render_base_inline(canvas, base_px[base], base_off)
 
-    #BASES LOADED ANIMATION Ducks on the pond
-    global cgif
-    #if (base_runners[0]) and (cgif == False):
-    if base_runners[0] and base_runners[1] and base_runners[2] and (cgif == False):
-        #tcolor = colors.graphics_color("standings.nl.divider")
+
+    #BASES LOADED ANIMATION
+    global playAn2
+    if base_runners[0] and base_runners[1] and base_runners[2] and (playAn2 == False):
+        #tcolor = colors.graphics_color("standings.al.divider")
         #graphics.DrawLine(canvas, 0, 26, 45, 26, tcolor)
-        cgif = True
-        animation_gif("ducks") #WILL RUN ANIMATION INIFINITELY AND CRASH BOARD
+        playAn2 = True
+        animation_gif("ducks")
 
 
 def __render_base_outline(canvas, base, color):
@@ -1030,12 +1077,26 @@ def __render_base_outline(canvas, base, color):
     graphics.DrawLine(canvas, x + half, y + size, x, y + half, color)
     graphics.DrawLine(canvas, x + half, y + size, x + size, y + half, color)
 
+def __render_base_inline(canvas, base, color):
+    x, y = (base["x"], base["y"])
+    size = base["size"]
+    half = abs(size // 2)
+    graphics.DrawLine(canvas, x + half, y + 1, x + half, y - 1 + size, color)
+    graphics.DrawLine(canvas, x + 1, y + half, x - 1 + size, y + half, color)
 
 def __render_baserunner(canvas, base, color):
     x, y = (base["x"], base["y"])
     size = base["size"]
     half = abs(size // 2)
     for offset in range(1, half + 1):
+        graphics.DrawLine(canvas, x + half - offset, y + size - offset, x + half + offset, y + size - offset, color)
+        graphics.DrawLine(canvas, x + half - offset, y + offset, x + half + offset, y + offset, color)
+
+def __render_baseoff(canvas, base, color):
+    x, y = (base["x"], base["y"])
+    size = base["size"]
+    half = abs(size // 2)
+    for offset in range(0, half + 1):
         graphics.DrawLine(canvas, x + half - offset, y + size - offset, x + half + offset, y + size - offset, color)
         graphics.DrawLine(canvas, x + half - offset, y + offset, x + half + offset, y + offset, color)
 
@@ -1048,30 +1109,30 @@ def _render_count(canvas, layout, colors, pitches: Pitches):
     batter_count_text = "{}-{}".format(pitches.balls, pitches.strikes)
 
     bgcolor = colors.graphics_color("default.background")
-    tcolor = colors.graphics_color("standings.nl.divider")
-
-    scolor = colors.graphics_color("standings.al.divider")
-    bcolor = colors.graphics_color("standings.nl.divider")
+    #tcolor = colors.graphics_color("standings.nl.divider")
 
     # Toggle between showing count at circles and numbers
     cCount = False
 
     xMax = canvas.width
     xMin = 1
+    xS = xMax-19  #Dont cover up bases
+
+    #Boolean to fully blank at-bat section
     fblank = False
 
-    yMin = 20 #14 21-26
-    yMax = yMin+6
-    xS = xMax-19
-
     if fblank is True:
-        yMin = 13
-        yMax = canvas.height
+        yMin = 15
+        yMax = canvas.height - 1
+    else:
+        yMin = 20 #14 21-26
+        yMax = yMin+6
 
-    #Fix instance where walk or strikeout happens but isn't recorded as a play result
+
+    #Fix instance where walk or strikeout happens but isn't recorded as a play result yet
     if pitches.balls > 3:
         #Extra blank pixel to cover bottom of pitches P
-        graphics.DrawLine(canvas, 39, yMax, 43, yMax, bgcolor)
+        graphics.DrawLine(canvas, 36, yMax, 43, yMax, bgcolor)
         for i in range (yMin, yMax):
             graphics.DrawLine(canvas, xMin, i, xS, i, bgcolor)
         __render_play_result(canvas, layout, colors, "walk")
@@ -1079,7 +1140,7 @@ def _render_count(canvas, layout, colors, pitches: Pitches):
         #animation_gif("walk") WILL RUN ANIMATION INIFINITELY AND CRASH BOARD
     elif pitches.strikes > 2:
         #Extra blank pixel to cover bottom of pitches P
-        graphics.DrawLine(canvas, 39, yMax, 43, yMax, bgcolor)
+        graphics.DrawLine(canvas, 36, yMax, 43, yMax, bgcolor)
         for i in range (yMin, yMax):
             graphics.DrawLine(canvas, xMin, i, xS, i, bgcolor)
         __render_play_result(canvas, layout, colors, "strikeout")
@@ -1098,15 +1159,20 @@ def _render_count(canvas, layout, colors, pitches: Pitches):
 def __out_colors(colors):
     outlines = []
     fills = []
+    off = []
     for i in range(3):
         color = colors.graphics_color(f"outs.{i+1}")
         outlines.append(color)
+
+        color = colors.graphics_color(f"outs.off.{i+1}")
+        off.append(color)
+
         try:
             color = colors.graphics_color(f"outs.fill.{i+1}")
         except KeyError:
             pass
         fills.append(color)
-    return outlines, fills
+    return outlines, off, fills
 
 
 def _render_outs(canvas, layout, colors, outs):
@@ -1116,13 +1182,15 @@ def _render_outs(canvas, layout, colors, outs):
     out_px.append(layout.coords("outs.3"))
 
     out_colors = []
-    out_colors, fill_colors = __out_colors(colors)
+    out_colors, off_colors, fill_colors = __out_colors(colors)
 
     for out in range(len(out_px)):
         __render_out_circle(canvas, out_px[out], out_colors[out])
         # Fill in the circle if that out has occurred
         if outs.number > out:
             __fill_out_circle(canvas, out_px[out], fill_colors[out])
+        else:
+            __fill_out_circle(canvas, out_px[out], off_colors[out])
 
 
 def __render_out_circle(canvas, out, color):
@@ -1152,28 +1220,38 @@ def __fill_out_circle(canvas, out, color):
 def __cball_colors(colors):
     outlines = []
     fills = []
+    off = []
     for i in range(3):
         color = colors.graphics_color(f"cballs.{i+1}")
         outlines.append(color)
+
+        color = colors.graphics_color(f"cballs.off.{i+1}")
+        off.append (color)
+
         try:
             color = colors.graphics_color(f"cballs.fill.{i+1}")
         except KeyError:
             pass
         fills.append(color)
-    return outlines, fills
+    return outlines, off, fills
 
 def __cstrike_colors(colors):
     outlines = []
     fills = []
+    off = []
     for i in range(2):
         color = colors.graphics_color(f"cstrikes.{i+1}")
         outlines.append(color)
+
+        color = colors.graphics_color(f"cstrikes.off.{i+1}")
+        off.append (color)
+
         try:
             color = colors.graphics_color(f"cstrikes.fill.{i+1}")
         except KeyError:
             pass
         fills.append(color)
-    return outlines, fills
+    return outlines, off, fills
 
 def _render_ccount(canvas, layout, colors, pitches):
     ball_px = []
@@ -1186,10 +1264,10 @@ def _render_ccount(canvas, layout, colors, pitches):
     strike_px.append(layout.coords("cstrikes.2"))
 
     ball_colors = []
-    ball_colors, bfill_colors = __cball_colors(colors)
+    ball_colors, boff_colors, bfill_colors = __cball_colors(colors)
 
     strike_colors = []
-    strike_colors, sfill_colors = __cstrike_colors(colors)
+    strike_colors, soff_colors, sfill_colors = __cstrike_colors(colors)
 
     #pitches.strikes > 2:
     for ball in range(len(ball_px)):
@@ -1197,12 +1275,16 @@ def _render_ccount(canvas, layout, colors, pitches):
         # Fill in the circle if that out has occurred
         if pitches.balls > ball:
             __fill_count_circle(canvas, ball_px[ball], bfill_colors[ball])
+        else:
+            __fill_count_circle(canvas, ball_px[ball], boff_colors[ball])
 
     for strike in range(len(strike_px)):
         __render_count_circle(canvas, strike_px[strike], strike_colors[strike])
         # Fill in the circle if that out has occurred
         if pitches.strikes > strike:
             __fill_count_circle(canvas, strike_px[strike], sfill_colors[strike])
+        else:
+            __fill_count_circle(canvas, strike_px[strike], soff_colors[strike])
 
 
 def __render_count_circle(canvas, ball, color):

@@ -56,6 +56,7 @@ def __render_static_wide_standings(canvas, layout, colors, division, league):
     team_name_color = get_standings_color_node(colors, "team.name", league)
     team_elim_color = get_standings_color_node(colors, "team.elim", league)
     team_clinched_color = get_standings_color_node(colors, "team.clinched", league)
+
     start = coords.get("start", 0)
     offset = coords["offset"]
 
@@ -68,9 +69,18 @@ def __render_static_wide_standings(canvas, layout, colors, division, league):
     offset += start
 
     for team in division.teams:
+
+        team_is_league_color = False
+        if (team_is_league_color):
+            color = get_standings_color_node(colors, "name", league)
+            #divider_color = bg_color
+            #bg_color = get_standings_color_node(colors, "background", league)
+            #team_name_color = get_standings_color_node(colors, "team.elim", league)
+        else:
+            color = team_elim_color if team.elim else (team_clinched_color if team.clinched else team_name_color)
+
         graphics.DrawLine(canvas, 0, offset, coords["width"], offset, divider_color)
 
-        color = team_elim_color if team.elim else (team_clinched_color if team.clinched else team_name_color)
         team_text = team.team_abbrev
         graphics.DrawText(canvas, font["font"], coords["team"]["name"]["x"], offset, color, team_text)
 
@@ -92,20 +102,20 @@ def __render_static_wide_standings(canvas, layout, colors, division, league):
     __render_standings_indicator(canvas, layout, colors, division, league)
 
 def __render_standings_indicator(canvas, layout, colors, division, league):
-    coords = layout.coords("standings")
-    font = layout.font("standings")
+    #coords = layout.coords("standings")
+    #font = layout.font("standings")
     divider_color = get_standings_color_node(colors, "divider", league)
-    team_stat_color = get_standings_color_node(colors, "team.stat", league)
+    #team_stat_color = get_standings_color_node(colors, "team.stat", league)
     team_name_color = get_standings_color_node(colors, "team.name", league)
-    start = coords.get("start", 0)
-    offset = coords["offset"]
+    #start = coords.get("start", 0)
+    #offset = coords["offset"]
 
     xMax = canvas.width
     yMax = canvas.height
     xMin = 0
-    yMin = 0
+    #yMin = 0
     xS = xMax-1
-    xH = xMax/2
+    xH = int(xMax/2)
     xt1 = xH / 3
     xt2 = (xH / 3) * 2
     yS = yMax-1
@@ -113,13 +123,18 @@ def __render_standings_indicator(canvas, layout, colors, division, league):
     graphics.DrawLine(canvas, xMin, yS, xS, yS, divider_color)
 
     if ("Wild Card" in division.name):
-        for x in range (xMin, xMax):
-            if (x % 5) > 0:
-                graphics.DrawLine(canvas, x, yS, x, yS, divider_color)
-                #graphics.DrawLine(canvas, x, yMin, x, yMin, divider_color)
-            else:
-                graphics.DrawLine(canvas, x, yS, x, yS, team_name_color)
-                #graphics.DrawLine(canvas, x, yMin, x, yMin, team_name_color)
+        if ("AL" in division.name):
+            for x in range (xMin, xH):
+                if (x % 5) > 0:
+                    graphics.DrawLine(canvas, x, yS, x, yS, divider_color)
+                else:
+                    graphics.DrawLine(canvas, x, yS, x, yS, team_name_color)
+        else:
+            for x in range (xH, xMax):
+                if (x % 5) > 0:
+                    graphics.DrawLine(canvas, x, yS, x, yS, divider_color)
+                else:
+                    graphics.DrawLine(canvas, x, yS, x, yS, team_name_color)
     if ("West" in division.name):
         if ("AL" in division.name):
             graphics.DrawLine(canvas, xMin, yS, xt1, yS, team_name_color)
