@@ -1,5 +1,4 @@
 import time
-from datetime import datetime, timedelta
 
 import statsapi
 
@@ -15,7 +14,7 @@ GAMES_REFRESH_RATE = 6 * 60
 class Schedule:
     def __init__(self, config):
         self.config = config
-        self.date = self.__parse_today()
+        self.date = self.config.parse_today()
         self.starttime = time.time()
         self.current_idx = 0
         # all games for the day
@@ -24,25 +23,15 @@ class Schedule:
         self._games = []
         self.update(True)
 
-    def __parse_today(self):
-        if self.config.demo_date:
-            today = datetime.strptime(self.config.demo_date, "%Y-%m-%d")
-        else:
-            today = datetime.today()
-            end_of_day = datetime.strptime(self.config.end_of_day, "%H:%M").replace(
-                year=today.year, month=today.month, day=today.day
-            )
-            if end_of_day > datetime.now():
-                today -= timedelta(days=1)
-        return today
-
     def update(self, force=False) -> UpdateStatus:
         if force or self.__should_update():
-            self.date = self.__parse_today()
+            self.date = self.config.parse_today()
             debug.log("Updating schedule for %s", self.date)
             self.starttime = time.time()
             try:
                 self.__all_games = statsapi.schedule(self.date.strftime("%Y-%m-%d"))
+                # WBC Games
+                self.__all_games = statsapi.schedule(self.date.strftime("%Y-%m-%d"), sportId="1,51")
             except:
                 debug.exception("Networking error while refreshing schedule")
                 return UpdateStatus.FAIL
@@ -58,7 +47,7 @@ class Schedule:
                         # but this is fine, since self.games_live() is will work even if we don't do this update
                         games = live_games
 
-                if len(games) > 0:        
+                if len(games) > 0:
                     self.current_idx %= len(games)
 
                 self._games = games
@@ -75,17 +64,14 @@ class Schedule:
     def is_offday_for_preferred_team(self):
         if self.config.preferred_teams:
             return not any(
-                data.teams.TEAM_FULL[self.config.preferred_teams[0]] in [game["away_name"], game["home_name"]]
+                data.teams.get_team_id(self.config.preferred_teams[0]) in [game["away_id"], game["home_id"]]
                 for game in self.__all_games  # only care if preferred team is actually in list
             )
         else:
             return True
 
     def is_offday(self):
-        if self.config.standings_no_games:
-            return not len(self.__all_games)  # care about all MLB
-        else:  # only care if we can't rotate a game
-            return not len(self._games)
+        return not len(self.__all_games)  # care about all MLB
 
     def games_live(self):
         return any(status.is_fresh(g["status"]) or (status.is_live(g["status"])) for g in self._games)
@@ -100,7 +86,8 @@ class Schedule:
 
     def next_game(self):
         # We only need to check the preferred team's game status if we're
-        # rotating during mid-innings
+        # rotating during mid-innings because, otherwise, we would never
+        # have rotated off of it up in data
         if (
             not self.config.rotation_preferred_team_live_enabled
             and self.config.rotation_preferred_team_live_mid_inning
@@ -130,18 +117,19 @@ class Schedule:
         return self.__current_game()
 
     def _game_index_for_preferred_team(self):
-        if self.config.preferred_teams:
-            team_name = data.teams.TEAM_FULL[self.config.preferred_teams[0]]
-            return next(
-                (
-                    i
-                    for i, game in enumerate(self._games)
-                    if team_name in [game["away_name"], game["home_name"]] and status.is_live(game["status"])
-                ),
-                -1,  # no live games for preferred team
-            )
+        if not self.config.preferred_teams:
+            return -1  # no preferred team
 
-        return -1  # no preferred team
+        team_id = data.teams.get_team_id(self.config.preferred_teams[0])
+        return next(
+            (
+                i
+                for i, game in enumerate(self._games)
+                if team_id in (game["away_id"], game["home_id"])
+            ),
+            -1, # no preferred team game
+        )
+
 
     def __next_game_index(self):
         counter = self.current_idx + 1
@@ -158,5 +146,5 @@ class Schedule:
 
     @staticmethod
     def __filter_list_of_games(games, filter_teams):
-        teams = [data.teams.TEAM_FULL[t] for t in filter_teams]
-        return list(game for game in games if set([game["away_name"], game["home_name"]]).intersection(set(teams)))
+        teams = set(data.teams.get_team_id(t) for t in filter_teams)
+        return list(game for game in games if set([game["away_id"], game["home_id"]]).intersection(teams))
